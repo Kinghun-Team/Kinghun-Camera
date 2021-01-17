@@ -1,0 +1,16 @@
+//
+//  Profile.pch
+//  JinXiangCamera
+//
+//  Created by Apple on 2021/1/13.
+//
+
+#ifndef Profile_pch
+#define Profile_pch
+
+#import <AVFoundation/AVFoundation.h>
+#import "CameraManager.h"
+#import "Header.h"
+#import "JHLabel.h"
+
+#endif /* Profile_pch */
