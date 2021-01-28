@@ -46,6 +46,12 @@
     return _splitView;
 }
 
+- (NSMutableArray *)dataArray {
+    if (!_dataArray) {
+        _dataArray = [NSMutableArray array];
+    }
+    return _dataArray;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -56,10 +62,6 @@
 }
 
 - (void)creatUI {
-    _dataArray = [NSMutableArray array];
-    for (int i=0; i<20; i++) {
-        [_dataArray addObject:[NSString stringWithFormat:@"%d行数据",i]];
-    }
     
     NSScrollView *tableContainerView = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, imageListWidth, _splitView.frame.size.height)];
     tableContainerView.hasVerticalScroller = YES;
@@ -82,6 +84,13 @@
     }
     
     JXCameraView *caView = [[JXCameraView alloc] initWithFrame:NSMakeRect(0, 0, self.view.frame.size.width-imageListWidth, _splitView.frame.size.height)];
+    WS(weakSelf)
+    caView.photoClickBlock = ^{
+        [[CameraManager sharedManager] getPhotoImage:^(NSImage * _Nonnull image) {
+            [weakSelf.dataArray addObject:image];
+            [weakSelf.imageListView reloadData];
+        }];
+    };
     if (@available(macOS 10.11, *)) {
         [self.splitView addArrangedSubview:caView];
     } else {
@@ -90,8 +99,9 @@
     [self.view addSubview:self.splitView];
 //    [self.splitView setPosition:imageListWidth ofDividerAtIndex:0];
     
-    
     [CameraManager cameraDefaultConfig];
+    [CameraManager sharedManager].iamgeSize = ImageSize2560;
+    
 }
 
 #pragma mark NSSplitViewDelegate
@@ -141,6 +151,7 @@
         view = [[JXImageDataView alloc]initWithFrame:CGRectMake(0, 0, imageListWidth, imageCellHeight)];
         view.identifier = @"cellId";
     }
+    view.image = self.dataArray[row];
     return view;
 }
 

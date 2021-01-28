@@ -9,10 +9,26 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef enum {
+    ImageSize1080 = 0,
+    ImageSize1960 = 1,
+    ImageSize2560 = 2,
+    ImageSize3860 = 3,
+}ImageSize;
+
+@protocol cameraManagerDelegate <NSObject>
+
+@optional
+
+-(void)cameraBufferIamge:(NSImage *)image;
+
+@end
+
 @interface CameraManager : NSObject
 
-//捕获设备，通常是前置摄像头，后置摄像头，麦克风（音频输入）
-@property (nonatomic, strong) AVCaptureDevice *device;
+@property(nonatomic,assign)ImageSize iamgeSize;
+
+@property(nonatomic,weak)id<cameraManagerDelegate> delegate;
 
 + (instancetype)sharedManager;
 
@@ -20,14 +36,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)setImageSessionPreset:(AVCaptureSessionPreset)sessionPreset;
 
-- (void)startCameraToView:(NSView *)view;
+- (void)setAVCapture:(AVCaptureDevice *)device;
+
+- (void)start;
 
 - (void)photoSetImage:(NSImageView *)imageView;
 
-//opencv
-- (id)initWithController:(NSViewController*)c andCameraImageView:(NSImageView*)iv processImage:(NSImageView *)processIv;
-- (void)start;
-- (void)stop;
+- (void)getPhotoImage:(void(^)(NSImage *image))successImage;
 
 @end
 

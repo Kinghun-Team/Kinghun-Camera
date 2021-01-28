@@ -8,6 +8,8 @@
 #ifndef Header_h
 #define Header_h
 
+#define WS(weakSelf) __weak __typeof(&*self)weakSelf = self;
+
 #define     mainScreendWidth     1000
 #define     mainScreendHeight    700
 

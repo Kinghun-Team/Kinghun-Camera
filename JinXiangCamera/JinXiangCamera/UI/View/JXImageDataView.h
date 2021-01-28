@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface JXImageDataView : NSView
 
+@property(nonatomic,copy)NSImage *image;
+
 @end
 
 NS_ASSUME_NONNULL_END

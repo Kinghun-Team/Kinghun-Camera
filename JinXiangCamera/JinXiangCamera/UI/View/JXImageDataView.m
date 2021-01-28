@@ -23,6 +23,12 @@
     // Drawing code here.
 }
 
+- (void)setImage:(NSImage *)image {
+    _image = image;
+    
+    self.imageView.image = image;
+}
+
 - (instancetype)initWithFrame:(NSRect)frame
 {
     self = [super initWithFrame:frame];
@@ -32,7 +38,6 @@
         
         self.imageView = [[NSImageView alloc] initWithFrame:NSMakeRect(10, 30, frame.size.width-20, frame.size.height - 40)];
         self.imageView.wantsLayer = YES;
-        self.imageView.image = [NSImage imageNamed:@"910835"];
         [self addSubview:self.imageView];
         
         self.label = [[JHLabel alloc] initWithFrame:NSMakeRect(10, 5, frame.size.width-20, 20)];
