@@ -10,7 +10,6 @@
 		1862C78225A4C1F9005AF08A /* JXImageDataView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1862C78125A4C1F9005AF08A /* JXImageDataView.m */; };
 		1862C7C925B212F1005AF08A /* JHLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1862C7C825B212F0005AF08A /* JHLabel.m */; };
 		1862C7D925B2E2AD005AF08A /* JXCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1862C7D825B2E2AD005AF08A /* JXCameraView.m */; };
-		1862C7DE25B2E5A3005AF08A /* 910835.png in Resources */ = {isa = PBXBuildFile; fileRef = 1862C7DD25B2E5A3005AF08A /* 910835.png */; };
 		1862C7E525B353BC005AF08A /* CustomButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 1862C7E425B353BB005AF08A /* CustomButton.m */; };
 		1862C80225B36F6A005AF08A /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1862C80125B36F69005AF08A /* Accelerate.framework */; };
 		1862C80425B36F78005AF08A /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1862C80325B36F78005AF08A /* CoreVideo.framework */; };
@@ -29,6 +28,8 @@
 		1879B17225A1CCC900CCC6F1 /* JXRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1879B17125A1CCC900CCC6F1 /* JXRootViewController.m */; };
 		1879B18325A1DA1A00CCC6F1 /* JXBaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1879B18125A1DA1A00CCC6F1 /* JXBaseViewController.m */; };
 		1879B19025A1ED4000CCC6F1 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1879B18F25A1ED4000CCC6F1 /* AVFoundation.framework */; };
+		188B1C5A25CD9B1A00246C8E /* JXImageDataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 188B1C5925CD9B1A00246C8E /* JXImageDataItem.m */; };
+		188B1C6325CDB51800246C8E /* JXFunctionListView.m in Sources */ = {isa = PBXBuildFile; fileRef = 188B1C6225CDB51800246C8E /* JXFunctionListView.m */; };
 		18C80ED225B3FD3C001617D0 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18C80ED125B3FD3C001617D0 /* opencv2.framework */; };
 		18C80EDE25B3FF71001617D0 /* NSImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 18C80EDD25B3FF71001617D0 /* NSImage+OpenCV.mm */; };
 		18C80EE425B3FF7B001617D0 /* CameraManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 18C80EE225B3FF7A001617D0 /* CameraManager.mm */; };
@@ -61,7 +62,6 @@
 		1862C7C825B212F0005AF08A /* JHLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JHLabel.m; sourceTree = "<group>"; };
 		1862C7D725B2E2AD005AF08A /* JXCameraView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXCameraView.h; sourceTree = "<group>"; };
 		1862C7D825B2E2AD005AF08A /* JXCameraView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JXCameraView.m; sourceTree = "<group>"; };
-		1862C7DD25B2E5A3005AF08A /* 910835.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 910835.png; sourceTree = "<group>"; };
 		1862C7E325B353BB005AF08A /* CustomButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomButton.h; sourceTree = "<group>"; };
 		1862C7E425B353BB005AF08A /* CustomButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomButton.m; sourceTree = "<group>"; };
 		1862C80125B36F69005AF08A /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -92,6 +92,10 @@
 		1879B18025A1DA1A00CCC6F1 /* JXBaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXBaseViewController.h; sourceTree = "<group>"; };
 		1879B18125A1DA1A00CCC6F1 /* JXBaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JXBaseViewController.m; sourceTree = "<group>"; };
 		1879B18F25A1ED4000CCC6F1 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		188B1C5825CD9B1A00246C8E /* JXImageDataItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXImageDataItem.h; sourceTree = "<group>"; };
+		188B1C5925CD9B1A00246C8E /* JXImageDataItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JXImageDataItem.m; sourceTree = "<group>"; };
+		188B1C6125CDB51800246C8E /* JXFunctionListView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXFunctionListView.h; sourceTree = "<group>"; };
+		188B1C6225CDB51800246C8E /* JXFunctionListView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JXFunctionListView.m; sourceTree = "<group>"; };
 		18C80ED125B3FD3C001617D0 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = opencv2.framework; path = JinXiangCamera/OpenCV/opencv2.framework; sourceTree = "<group>"; };
 		18C80EDC25B3FF70001617D0 /* NSImage+OpenCV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSImage+OpenCV.h"; sourceTree = "<group>"; };
 		18C80EDD25B3FF71001617D0 /* NSImage+OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSImage+OpenCV.mm"; sourceTree = "<group>"; };
@@ -196,7 +200,6 @@
 			children = (
 				1879B13325A1C98E00CCC6F1 /* AppDelegate.h */,
 				1879B13425A1C98E00CCC6F1 /* AppDelegate.m */,
-				1862C7DD25B2E5A3005AF08A /* 910835.png */,
 				1862C7AE25AE0067005AF08A /* Profile */,
 				1879B16725A1C9C300CCC6F1 /* Camera */,
 				1879B16625A1C9B900CCC6F1 /* UI */,
@@ -261,10 +264,14 @@
 		1879B16F25A1CC5100CCC6F1 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				188B1C5825CD9B1A00246C8E /* JXImageDataItem.h */,
+				188B1C5925CD9B1A00246C8E /* JXImageDataItem.m */,
 				1862C78025A4C1F9005AF08A /* JXImageDataView.h */,
 				1862C78125A4C1F9005AF08A /* JXImageDataView.m */,
 				1862C7D725B2E2AD005AF08A /* JXCameraView.h */,
 				1862C7D825B2E2AD005AF08A /* JXCameraView.m */,
+				188B1C6125CDB51800246C8E /* JXFunctionListView.h */,
+				188B1C6225CDB51800246C8E /* JXFunctionListView.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -401,7 +408,6 @@
 			files = (
 				1879B13A25A1C99100CCC6F1 /* Assets.xcassets in Resources */,
 				1879B13D25A1C99100CCC6F1 /* Main.storyboard in Resources */,
-				1862C7DE25B2E5A3005AF08A /* 910835.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -430,7 +436,9 @@
 				1862C7C925B212F1005AF08A /* JHLabel.m in Sources */,
 				1862C7D925B2E2AD005AF08A /* JXCameraView.m in Sources */,
 				1879B14025A1C99100CCC6F1 /* main.m in Sources */,
+				188B1C5A25CD9B1A00246C8E /* JXImageDataItem.m in Sources */,
 				1862C78225A4C1F9005AF08A /* JXImageDataView.m in Sources */,
+				188B1C6325CDB51800246C8E /* JXFunctionListView.m in Sources */,
 				1879B17225A1CCC900CCC6F1 /* JXRootViewController.m in Sources */,
 				1879B13525A1C98E00CCC6F1 /* AppDelegate.m in Sources */,
 				18C80EDE25B3FF71001617D0 /* NSImage+OpenCV.mm in Sources */,
@@ -616,7 +624,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JinXiang.image.JinXiangCamera;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -645,7 +653,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JinXiang.image.JinXiangCamera;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

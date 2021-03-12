@@ -34,7 +34,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.wantsLayer = YES;
-        self.layer.backgroundColor = [NSColor clearColor].CGColor;
+        self.layer.backgroundColor = [NSColor whiteColor].CGColor;
         
         self.imageView = [[NSImageView alloc] initWithFrame:NSMakeRect(10, 30, frame.size.width-20, frame.size.height - 40)];
         self.imageView.wantsLayer = YES;
@@ -46,8 +46,6 @@
 //        self.label.textAlignment = NSTextAlignmentCenter;
         self.label.font = [NSFont boldSystemFontOfSize:15];
         [self addSubview:self.label];
-        
-//        NSLog(@"%f,%f",self.imageView.frame.size.width,self.imageView.frame.size.height);
         self.label.text = @"测试图片";
     }
     return self;

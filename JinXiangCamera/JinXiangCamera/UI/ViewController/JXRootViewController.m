@@ -6,20 +6,18 @@
 //
 
 #import "JXRootViewController.h"
-#import "JXImageDataView.h"
 #import "JXCameraView.h"
+#import "JXFunctionListView.h"
+#import "JXImageDataItem.h"
 
-#define imageListWidth  240
-#define imageCellHeight 205
+#define    FWidth   180
 
-@interface JXRootViewController ()<NSSplitViewDelegate,NSTableViewDelegate,NSTableViewDataSource>
+@interface JXRootViewController ()<NSSplitViewDelegate,NSCollectionViewDelegate,NSCollectionViewDataSource,NSCollectionViewDelegateFlowLayout>
 
 @property(nonatomic,strong)NSMutableArray<AVCaptureDevice *> *cameraList;
 
 @property(nonatomic,strong)NSSplitView *splitView;
-
-@property(nonatomic,strong)NSTableView *imageListView;
-@property(nonatomic,strong)JXCameraView *caView;
+@property(nonatomic,strong)NSCollectionView *mainCollection;
 
 @property(nonatomic,copy)NSMutableArray *dataArray;
 
@@ -30,13 +28,11 @@
 - (void)viewWillAppear {
     [super viewWillAppear];
     
-    //检测摄像头
-    [self findCamera];
 }
 
 - (NSSplitView *)splitView {
     if (!_splitView) {
-        _splitView = [[NSSplitView alloc] initWithFrame:self.view.bounds];
+        _splitView = [[NSSplitView alloc] initWithFrame:NSMakeRect(0, 0, self.view.frame.size.width-FWidth, self.view.frame.size.height)];
         _splitView.wantsLayer = YES;
         _splitView.delegate = self;
         _splitView.vertical = YES;
@@ -44,6 +40,22 @@
         _splitView.layer.backgroundColor = NSColor.whiteColor.CGColor;
     }
     return _splitView;
+}
+
+-(NSCollectionView *)mainCollection{
+    if (!_mainCollection) {
+        NSCollectionViewFlowLayout *flowLayout = [[NSCollectionViewFlowLayout alloc] init];
+        flowLayout.minimumLineSpacing = 0; // 最小横向间距
+        flowLayout.minimumInteritemSpacing = 0; // 最小竖向间距
+        _mainCollection = [[NSCollectionView alloc] initWithFrame:NSMakeRect(0, 0, imageListWidth, _splitView.frame.size.height)];
+        _mainCollection.wantsLayer = YES;
+        _mainCollection.collectionViewLayout = flowLayout;
+        _mainCollection.layer.backgroundColor = [NSColor redColor].CGColor;
+        _mainCollection.selectable = YES;
+        _mainCollection.delegate = self;
+        _mainCollection.dataSource = self;
+    }
+    return _mainCollection;
 }
 
 - (NSMutableArray *)dataArray {
@@ -55,52 +67,35 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     self.title = @"金翔影像";
     
     [self creatUI];
 }
 
 - (void)creatUI {
-    
-    NSScrollView *tableContainerView = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, imageListWidth, _splitView.frame.size.height)];
+    NSScrollView *tableContainerView = [[NSScrollView alloc] initWithFrame:self.mainCollection.bounds];
     tableContainerView.hasVerticalScroller = YES;
-    self.imageListView = [[NSTableView alloc] initWithFrame: tableContainerView.bounds];
-    self.imageListView.delegate = self;
-    self.imageListView.rowHeight = imageCellHeight;
-    self.imageListView.dataSource = self;
-    self.imageListView.headerView = [NSTableHeaderView new];
-    NSTableColumn * column = [[NSTableColumn alloc] initWithIdentifier:@"column"];
-    column.resizingMask = NSTableColumnNoResizing;
-//    column.headerCell = [NSTableHeaderCell new];
-    [column setWidth:200];
-    [self.imageListView addTableColumn:column];
-    [self.imageListView reloadData];
-    [tableContainerView setDocumentView:self.imageListView];
-    if (@available(macOS 10.11, *)) {
-        [self.splitView addArrangedSubview:tableContainerView];
-    } else {
-        
-    }
+    NSClipView *clip = [[NSClipView alloc] initWithFrame:self.mainCollection.bounds];
+    clip.documentView = self.mainCollection;
+    tableContainerView.contentView = clip;
+    [self.splitView addArrangedSubview:tableContainerView];
+    [_mainCollection registerClass:[JXImageDataItem class] forItemWithIdentifier:@"JXImageDataItem"];
     
-    JXCameraView *caView = [[JXCameraView alloc] initWithFrame:NSMakeRect(0, 0, self.view.frame.size.width-imageListWidth, _splitView.frame.size.height)];
     WS(weakSelf)
+    JXCameraView *caView = [[JXCameraView alloc] initWithFrame:NSMakeRect(0, 0, self.view.frame.size.width-imageListWidth-FWidth, _splitView.frame.size.height)];
     caView.photoClickBlock = ^{
         [[CameraManager sharedManager] getPhotoImage:^(NSImage * _Nonnull image) {
             [weakSelf.dataArray addObject:image];
-            [weakSelf.imageListView reloadData];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf.mainCollection reloadData];
+            });
         }];
     };
-    if (@available(macOS 10.11, *)) {
-        [self.splitView addArrangedSubview:caView];
-    } else {
-        
-    }
+    [self.splitView addArrangedSubview:caView];
     [self.view addSubview:self.splitView];
-//    [self.splitView setPosition:imageListWidth ofDividerAtIndex:0];
     
-    [CameraManager cameraDefaultConfig];
-    [CameraManager sharedManager].iamgeSize = ImageSize2560;
+    JXFunctionListView *fListView = [[JXFunctionListView alloc] initWithFrame:NSMakeRect(self.view.frame.size.width-FWidth, 0, FWidth, self.view.frame.size.height)];
+    [self.view addSubview:fListView];
     
 }
 
@@ -126,62 +121,36 @@
     
 }
 
-
-
-#pragma mark Table DataSource
-//数据源方法（返回NSTableView有多少行）
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    return _dataArray.count;
+#pragma mark NSCollectionViewDelegate
+//个数
+-(NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
+    return self.dataArray.count;
+}
+//内容
+-(NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath{
+    JXImageDataItem *item = [collectionView makeItemWithIdentifier:@"JXImageDataItem" forIndexPath:indexPath];
+    item.image = self.dataArray[indexPath.item];
+    item.view.layer.backgroundColor = NSColor.whiteColor.CGColor;
+    return item;
 }
 
-//- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row{
-//    return _dataArray[row];
-//}
-
-#pragma mark Table Delegate
-//设置是否可以进行编辑
-- (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row{
-    return NO;
+- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths {
+    NSIndexPath *indexPath = indexPaths.allObjects.firstObject;
+    JXImageDataItem *cell = (JXImageDataItem *)[collectionView itemAtIndexPath:indexPath];
+    cell.view.layer.backgroundColor = NSColor.lightGrayColor.CGColor;
 }
 
-- (nullable NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row {
-    //根据ID取视图
-    JXImageDataView * view = [tableView makeViewWithIdentifier:@"cellId" owner:self];
-    if (!view) {
-        view = [[JXImageDataView alloc]initWithFrame:CGRectMake(0, 0, imageListWidth, imageCellHeight)];
-        view.identifier = @"cellId";
-    }
-    view.image = self.dataArray[row];
-    return view;
+- (void)collectionView:(NSCollectionView *)collectionView didDeselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths {
+    NSIndexPath *indexPath = indexPaths.allObjects.firstObject;
+    JXImageDataItem *cell = (JXImageDataItem *)[collectionView itemAtIndexPath:indexPath];
+    cell.view.layer.backgroundColor = NSColor.whiteColor.CGColor;
 }
 
-//- (nullable NSTableRowView *)tableView:(NSTableView *)tableView rowViewForRow:(NSInteger)row{
-//    TableRow * rowView = [[TableRow alloc]init];
-//    return rowView;
-//}
-
-//选中的响应
-- (void)tableViewSelectionDidChange:(nonnull NSNotification *)notification {
-    NSTableView* tableView = notification.object;
-    //选中的行数
-    //tableView.selectedRow;
-    //选中的列数(列数无效，因为只能同时选中行。不能单独选中Cell)
-    //tableView.selectedColumn;
-    NSLog(@"%ld %ld", (long)tableView.selectedRow , (long)tableView.selectedColumn);
+#pragma mark - 布局协议
+//item的size
+- (NSSize)collectionView:(NSCollectionView *)collectionView layout:(NSCollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    return CGSizeMake(imageListWidth, imageCellHeight);
 }
-
-- (void)findCamera {
-    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-    NSArray *devList = @[@"UVC Camera VendorID_3141 ProductID_5634"];
-    self.cameraList = [NSMutableArray array];
-    for (AVCaptureDevice *dev in devices) {
-        if ([devList containsObject:dev.modelID]) {
-            [self.cameraList addObject:dev];
-        }
-    }
-    NSLog(@"%@",self.cameraList);
-}
-
 
 
 @end

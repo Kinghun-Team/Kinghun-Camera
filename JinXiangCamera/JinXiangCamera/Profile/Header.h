@@ -10,7 +10,10 @@
 
 #define WS(weakSelf) __weak __typeof(&*self)weakSelf = self;
 
-#define     mainScreendWidth     1000
+#define     mainScreendWidth     1200
 #define     mainScreendHeight    700
+
+#define     imageListWidth  240
+#define     imageCellHeight 205
 
 #endif /* Header_h */

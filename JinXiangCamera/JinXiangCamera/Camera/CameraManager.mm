@@ -35,12 +35,29 @@ typedef void(^GetImage)(NSImage *iamge);
 //图像预览层，实时显示捕获的图像
 @property (nonatomic ,strong) AVCaptureVideoPreviewLayer *previewLayer;
 
-@property (nonatomic,assign) CGFloat iamgeHeight;//图片高度  图片比例9：16
+@property (nonatomic,assign) CGFloat imageWidth;//图片高度  图片比例9：16
 @property(nonatomic,assign)BOOL getPhoto;//获取图片
 
 @end
 
 @implementation CameraManager
+
++ (NSArray *)cameraDevice {
+    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    NSArray *devList = @[@"UVC Camera VendorID_3141 ProductID_5634"];//摄像头id
+    
+    NSMutableArray *cameraList = [NSMutableArray array];
+    for (AVCaptureDevice *dev in devices) {
+        if ([devList containsObject:dev.modelID]) {
+            [cameraList addObject:dev];
+        }
+    }
+    if (cameraManager.allCamera == YES) {
+        return devices;
+    } else {
+        return cameraList;
+    }
+}
 
 - (AVCaptureSession *)session {
     if (!_session) {
@@ -61,12 +78,18 @@ typedef void(^GetImage)(NSImage *iamge);
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedManager = [[CameraManager alloc] init];
+        sharedManager.imageType = IMGPNG;
+        sharedManager.imageSize = imageSize1920;
     });
     return sharedManager;
 }
 
 + (void)cameraDefaultConfig {
-    [cameraManager setAVCapture:[cameraManager cameraWithPosition:AVCaptureDevicePositionFront]];
+    NSArray *arr = [CameraManager cameraDevice];
+    if (arr.count == 0) {
+        return;
+    }
+    [cameraManager setAVCapture:arr.firstObject];
 }
 
 + (void)setImageSessionPreset:(AVCaptureSessionPreset)sessionPreset {
@@ -77,8 +100,8 @@ typedef void(^GetImage)(NSImage *iamge);
 
 - (void)setAVCapture:(AVCaptureDevice *)device{
     self.device = device;
+    
     self.input = [[AVCaptureDeviceInput alloc] initWithDevice:self.device error:nil];
-    //     拿到的图像的大小可以自行设定
     //    AVCaptureSessionPreset1280x720
     //    AVCaptureSessionPreset1920x1080
     //    AVCaptureSessionPreset3840x2160
@@ -95,6 +118,7 @@ typedef void(^GetImage)(NSImage *iamge);
     [self.videoDataOutput setAlwaysDiscardsLateVideoFrames:YES];
     [self.videoDataOutput setSampleBufferDelegate:self queue:self.videoDataOutputQueue];
     
+//    camera.setDisplayOrientation(0);
     //输入输出设备结合
     if ([self.session canAddInput:self.input]) {
         [self.session addInput:self.input];
@@ -106,45 +130,53 @@ typedef void(^GetImage)(NSImage *iamge);
     if ([self.session canAddOutput:self.videoDataOutput]) {
         [self.session addOutput:self.videoDataOutput];
     }
+    
+//    for (AVCaptureConnection * av in self.videoDataOutput.connections) {
+//        if (av.supportsVideoMirroring) {
+//            //镜像设置
+//            av.videoMirrored = YES;
+//        }
+//    }
 }
 
+
 - (void)start {
-    //预览层的生成
-//    self.previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
-//    self.previewLayer.frame = view.bounds;
-//    self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-////    [[self.previewLayer connection] setVideoOrientation:(AVCaptureVideoOrientationPortrait)];
-//    [view.layer insertSublayer:self.previewLayer above:0];
-    
-//    if ([self.device lockForConfiguration:nil]) {
-//        //自动闪光灯，
-//        if ([self.device isFlashModeSupported:AVCaptureFlashModeAuto]) {
-//            [self.device setFlashMode:AVCaptureFlashModeAuto];
-//        }
-//        //自动白平衡,但是好像一直都进不去
-//        if ([self.device isWhiteBalanceModeSupported:AVCaptureWhiteBalanceModeAutoWhiteBalance]) {
-//            [self.device setWhiteBalanceMode:AVCaptureWhiteBalanceModeAutoWhiteBalance];
-//        }
-//        [self.device unlockForConfiguration];
-//    }
-    
-//    NSError *error;
-//    if ([self.device lockForConfiguration:&error]) {
-//        [self.device setFocusPointOfInterest:CGPointMake(view.frame.origin.x + view.frame.size.width/2, view.frame.origin.y + view.frame.size.height/2)];AVCaptureFocusModeContinuousAutoFocus
-//        self.device.focusMode = AVCaptureFocusModeAutoFocus;
-//        [self.device unlockForConfiguration];
-//    }
-//    else{
-//        NSLog(@"%@",error);
-//    }
-    
+    if (self.device == nil) {
+        [CameraManager cameraDefaultConfig];
+    }
     //设备取景开始
     [self.session startRunning];
 }
 
-- (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position{
-    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-    return devices.lastObject;
+- (void)stop {
+    if (self.device != nil) {
+        for(AVCaptureInput *input in self.session.inputs){
+            [self.session removeInput:input];
+        }
+        for(AVCaptureOutput *output in self.session.outputs){
+            [self.session removeOutput:output];
+        }
+        self.videoDataOutput = nil;
+        self.videoDataOutputQueue = nil;
+        self.device = nil;
+        self.input = nil;
+    }
+    [self.session stopRunning];
+}
+
+- (void)setNewAVCapture:(AVCaptureDevice *)device{
+    [self.session beginConfiguration];
+    [self.session removeInput:self.input];
+    
+    AVCaptureDeviceInput *newInput = [[AVCaptureDeviceInput alloc] initWithDevice:device error:nil];
+    if ([self.session canAddInput:newInput]) {
+        [self.session addInput:newInput];
+        self.input = newInput;
+    } else {
+        // 防止 newInput 不可用
+        [self.session addInput:self.input];
+    }
+    [self.session commitConfiguration];
 }
 
 #pragma mark  AVCaptureVideoDataOutputSampleBufferDelegate 视频流
@@ -153,6 +185,8 @@ typedef void(^GetImage)(NSImage *iamge);
 //    dispatch_async(queue, ^{
 //    });
     NSImage *iamge = [self convertSameBufferToNSImage:sampleBuffer];
+    
+//    image = [[UIImage alloc]initWithCGImage:image.CGImage scale:1.0f orientation:imgOrientation];
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(cameraBufferIamge:)]) {
             [self.delegate cameraBufferIamge:iamge];
@@ -165,8 +199,7 @@ typedef void(^GetImage)(NSImage *iamge);
     }
 }
 
-- (NSImage *)convertSameBufferToNSImage:(CMSampleBufferRef)sampleBuffer
-{
+- (NSImage *)convertSameBufferToNSImage:(CMSampleBufferRef)sampleBuffer {
     // 为媒体数据设置一个CMSampleBuffer的Core Video图像缓存对象
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     // 锁定pixel buffer的基地址
@@ -190,29 +223,42 @@ typedef void(^GetImage)(NSImage *iamge);
     CGContextRelease(context);
     CGColorSpaceRelease(colorSpace);
     
-    switch (self.iamgeSize) {
-        case ImageSize1080:
-            self.iamgeHeight = 1080.0/2;
+    switch (self.imageSize) {
+        case imageSize1920:
+            self.imageWidth = 1080.0/2;
             break;
-        case ImageSize1960:
-            self.iamgeHeight = 1960.0/2;
+        case imageSize2560:
+            self.imageWidth = 1440.0/2;
             break;
-        case ImageSize2560:
-            self.iamgeHeight = 2560.0/2;
+        case imageSize3840:
+            self.imageWidth = 2160.0/2;
             break;
-        case ImageSize3860:
-            self.iamgeHeight = 3860.0/2;
+        case imageSize4480:
+            self.imageWidth = 2520.0/2;
             break;
         default:
-            self.iamgeHeight = 1080.0/2;
             break;
     }
     // 用Quartz image创建一个UIImage对象image
-    NSImage *image = [[NSImage alloc] initWithCGImage:quartzImage size:NSMakeSize(self.iamgeHeight*16.0/9.0, self.iamgeHeight)];
-//    UIImage *image = [UIImage imageWithCGImage:quartzImage];
+    NSImage *image = [[NSImage alloc] initWithCGImage:quartzImage size:NSMakeSize(self.imageWidth*16.0/9.0, self.imageWidth)];
+    
     // 释放Quartz image对象
     CGImageRelease(quartzImage);
     return (image);
+}
+
+- (NSImage *)mirrorImage:(NSImage *)originImage{
+//    CGRect rect = CGRectMake(0, 0, originImage.size.width , originImage.size.height);
+//    UIGraphicsBeginImageContextWithOptions(rect.size, false, 2);
+//    CGContextRef currentContext =  UIGraphicsGetCurrentContext();
+//    CGContextClipToRect(currentContext, rect);
+//    CGContextRotateCTM(currentContext, M_PI);
+//    CGContextTranslateCTM(currentContext, -rect.size.width, -rect.size.height);
+//    CGContextDrawImage(currentContext, rect, originImage.CGImage);
+//    UIImage* drawImage =  UIGraphicsGetImageFromCurrentImageContext();
+//    return [UIImage imageWithCGImage:drawImage.CGImage scale:originImage.scale orientation:originImage.imageOrientation];
+//    [[NSImage alloc] initWithDataIgnoringOrientation:originImage];
+    return originImage;
 }
 
 - (void)photoSetImage:(NSImageView *)imageView {
@@ -245,10 +291,32 @@ typedef void(^GetImage)(NSImage *iamge);
     NSDictionary *imageProps = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:0] forKey:NSImageCompressionFactor];
     
     //之后 转化为NSData 以便存到文件中
-    NSData *imageData = [bits representationUsingType:NSPNGFileType properties:imageProps];
+    NSBitmapImageFileType imageType = NSPNGFileType;
+    NSString *fileString = @"png";
+    switch (self.imageType) {
+        case IMGPNG:
+            imageType = NSPNGFileType;
+            fileString = @"png";
+            break;
+        case IMGJPG:
+            imageType = NSBitmapImageFileTypeJPEG;
+            fileString = @"jpg";
+            break;
+        case IMGTIF:
+            imageType = NSBitmapImageFileTypeTIFF;
+            fileString = @"TIF";
+            break;
+        case IMGBMP:
+            imageType = NSBitmapImageFileTypeBMP;
+            fileString = @"BMP";
+            break;
+        default:
+            break;
+    }
     
+    NSData *imageData = [bits representationUsingType:imageType properties:imageProps];
     //设定好文件路径后进行存储就ok了
-    BOOL isSuccess = [imageData writeToFile:[@"~/Documents/photoTest.png" stringByExpandingTildeInPath] atomically:YES];
+    BOOL isSuccess = [imageData writeToFile:[[NSString stringWithFormat:@"~/Documents/photoTest.%@",fileString] stringByExpandingTildeInPath] atomically:YES];
     //保存的文件路径一定要是绝对路径，相对路径不行
     NSLog(@"Save Image: %d", isSuccess);
 }

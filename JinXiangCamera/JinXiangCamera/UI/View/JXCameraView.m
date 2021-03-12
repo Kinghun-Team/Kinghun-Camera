@@ -43,11 +43,9 @@
         self.photoButton.action = @selector(photoClick);
         [self addSubview:self.photoButton];
         
+        [CameraManager sharedManager].allCamera = YES;
         [CameraManager sharedManager].delegate = self;
         [[CameraManager sharedManager] start];
-        
-//        self.photoButton.shadowOffset = CGSizeMake(1, 2);
-//        [self.photoButton setTitle:@"拍照" color:[NSColor whiteColor] font:18];
     }
     return self;
 }

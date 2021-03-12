@@ -10,39 +10,47 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef enum {
-    ImageSize1080 = 0,
-    ImageSize1960 = 1,
-    ImageSize2560 = 2,
-    ImageSize3860 = 3,
+    imageSize1920 = 0,
+    imageSize2560 = 1,
+    imageSize3840 = 2,
+    imageSize4480 = 3,
 }ImageSize;
 
-@protocol cameraManagerDelegate <NSObject>
+typedef enum {
+    IMGJPG = 0,
+    IMGPNG = 1,
+    IMGTIF = 2,
+    IMGBMP = 3,
+}ImageType;
+
+@protocol cameraManagerDelegate<NSObject>
 
 @optional
 
--(void)cameraBufferIamge:(NSImage *)image;
+-(void)cameraBufferIamge:(NSImage *)image;//获取图片
 
 @end
 
 @interface CameraManager : NSObject
 
-@property(nonatomic,assign)ImageSize iamgeSize;
+@property(nonatomic,assign)BOOL allCamera;//开启获取所有可用摄像头
+
+@property(nonatomic,assign)ImageSize imageSize;//图片大小设置
+@property(nonatomic,assign)ImageType imageType;//图片文件类型
 
 @property(nonatomic,weak)id<cameraManagerDelegate> delegate;
 
+
+
 + (instancetype)sharedManager;
++ (void)cameraDefaultConfig;//默认设置
++ (NSArray *)cameraDevice;//获取摄像头
 
-+ (void)cameraDefaultConfig;
+- (void)start;//开始取景
+- (void)stop;//停止
 
-+ (void)setImageSessionPreset:(AVCaptureSessionPreset)sessionPreset;
-
-- (void)setAVCapture:(AVCaptureDevice *)device;
-
-- (void)start;
-
-- (void)photoSetImage:(NSImageView *)imageView;
-
-- (void)getPhotoImage:(void(^)(NSImage *image))successImage;
+- (void)setNewAVCapture:(AVCaptureDevice *)device;//设置新的摄像头
+- (void)getPhotoImage:(void(^)(NSImage *image))successImage;//获取NSImage对象
 
 @end
 

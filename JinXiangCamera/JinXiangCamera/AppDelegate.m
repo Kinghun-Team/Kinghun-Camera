@@ -27,7 +27,8 @@
 //    mainWindow.contentViewController = mainVC;
     
     [self.mainWindow setContentSize:NSMakeSize(mainScreendWidth, mainScreendHeight)];
-    self.mainWindow.minSize = NSMakeSize(800, 600);
+    self.mainWindow.minSize = NSMakeSize(mainScreendWidth, mainScreendHeight);//NSMakeSize(800, 600)
+    self.mainWindow.maxSize = NSMakeSize(mainScreendWidth, mainScreendHeight);//固定窗口
     
     self.mainWindowController = [[NSWindowController alloc] initWithWindow:self.mainWindow];
     mainVC.view.window.windowController = self.mainWindowController;
