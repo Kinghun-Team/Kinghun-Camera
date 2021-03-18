@@ -38,9 +38,10 @@ typedef enum {
 @property(nonatomic,assign)ImageSize imageSize;//图片大小设置
 @property(nonatomic,assign)ImageType imageType;//图片文件类型
 
+//NSDownloadsDirectory下载  NSDesktopDirectory桌面
+@property(nonatomic,assign)NSSearchPathDirectory searchPath;//文件保存路径
+
 @property(nonatomic,weak)id<cameraManagerDelegate> delegate;
-
-
 
 + (instancetype)sharedManager;
 + (void)cameraDefaultConfig;//默认设置

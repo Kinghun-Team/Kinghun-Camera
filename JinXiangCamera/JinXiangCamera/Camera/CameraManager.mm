@@ -80,6 +80,7 @@ typedef void(^GetImage)(NSImage *iamge);
         sharedManager = [[CameraManager alloc] init];
         sharedManager.imageType = IMGPNG;
         sharedManager.imageSize = imageSize1920;
+        sharedManager.searchPath = NSDownloadsDirectory;
     });
     return sharedManager;
 }
@@ -289,35 +290,38 @@ typedef void(^GetImage)(NSImage *iamge);
     
     //再设置后面要用到得 props属性
     NSDictionary *imageProps = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:0] forKey:NSImageCompressionFactor];
-    
     //之后 转化为NSData 以便存到文件中
     NSBitmapImageFileType imageType = NSPNGFileType;
-    NSString *fileString = @"png";
+    NSString *fileType = @"png";
     switch (self.imageType) {
         case IMGPNG:
             imageType = NSPNGFileType;
-            fileString = @"png";
+            fileType = @"png";
             break;
         case IMGJPG:
             imageType = NSBitmapImageFileTypeJPEG;
-            fileString = @"jpg";
+            fileType = @"jpg";
             break;
         case IMGTIF:
             imageType = NSBitmapImageFileTypeTIFF;
-            fileString = @"TIF";
+            fileType = @"TIF";
             break;
         case IMGBMP:
             imageType = NSBitmapImageFileTypeBMP;
-            fileString = @"BMP";
+            fileType = @"BMP";
             break;
         default:
             break;
     }
     
     NSData *imageData = [bits representationUsingType:imageType properties:imageProps];
-    //设定好文件路径后进行存储就ok了
-    BOOL isSuccess = [imageData writeToFile:[[NSString stringWithFormat:@"~/Documents/photoTest.%@",fileString] stringByExpandingTildeInPath] atomically:YES];
-    //保存的文件路径一定要是绝对路径，相对路径不行
+    NSURL *url = [[NSFileManager defaultManager] URLsForDirectory:self.searchPath inDomains:NSUserDomainMask].firstObject;
+    [self createFile:[NSString stringWithFormat:@"photoTest.%@",fileType] withUrl:url withFileData:imageData];
+}
+
+- (void)createFile:(NSString *)name withUrl:(NSURL *)fileBaseUrl withFileData:(NSData *)data {
+    NSURL *file = [fileBaseUrl URLByAppendingPathComponent:name];
+    BOOL isSuccess = [data writeToFile:[file.path stringByExpandingTildeInPath] atomically:YES];
     NSLog(@"Save Image: %d", isSuccess);
 }
 

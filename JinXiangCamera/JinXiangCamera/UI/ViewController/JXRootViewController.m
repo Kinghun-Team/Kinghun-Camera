@@ -97,6 +97,8 @@
     JXFunctionListView *fListView = [[JXFunctionListView alloc] initWithFrame:NSMakeRect(self.view.frame.size.width-FWidth, 0, FWidth, self.view.frame.size.height)];
     [self.view addSubview:fListView];
     
+     [[NSFileManager defaultManager] URLsForDirectory:NSDesktopDirectory inDomains:NSUserDomainMask];
+    
 }
 
 #pragma mark NSSplitViewDelegate

@@ -112,8 +112,6 @@
     self.imageType.editable = NO;
     [self addSubview:self.imageType];
     
-    
-    
     [self findCamera];
 }
 
