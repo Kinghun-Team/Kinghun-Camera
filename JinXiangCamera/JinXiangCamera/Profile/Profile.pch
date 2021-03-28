@@ -12,5 +12,6 @@
 #import "CameraManager.h"
 #import "Header.h"
 #import "JHLabel.h"
+#import "NSButton+JXExpand.h"
 
 #endif /* Profile_pch */

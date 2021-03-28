@@ -9,9 +9,11 @@
 #import "JXCameraView.h"
 #import "JXFunctionListView.h"
 #import "JXImageDataItem.h"
+#import "JXSelectFileView.h"
+#import "JXImageModel.h"
 
-#define    FWidth   180
-
+#define    FWidth   220
+#define    FileViewHeight   50
 @interface JXRootViewController ()<NSSplitViewDelegate,NSCollectionViewDelegate,NSCollectionViewDataSource,NSCollectionViewDelegateFlowLayout>
 
 @property(nonatomic,strong)NSMutableArray<AVCaptureDevice *> *cameraList;
@@ -21,6 +23,8 @@
 
 @property(nonatomic,copy)NSMutableArray *dataArray;
 
+@property(nonatomic,strong)JXFunctionListView *fListView;
+
 @end
 
 @implementation JXRootViewController
@@ -28,11 +32,12 @@
 - (void)viewWillAppear {
     [super viewWillAppear];
     
+    
 }
 
 - (NSSplitView *)splitView {
     if (!_splitView) {
-        _splitView = [[NSSplitView alloc] initWithFrame:NSMakeRect(0, 0, self.view.frame.size.width-FWidth, self.view.frame.size.height)];
+        _splitView = [[NSSplitView alloc] initWithFrame:NSMakeRect(0, 0, self.view.frame.size.width-FWidth, self.view.frame.size.height-FileViewHeight)];
         _splitView.wantsLayer = YES;
         _splitView.delegate = self;
         _splitView.vertical = YES;
@@ -50,7 +55,7 @@
         _mainCollection = [[NSCollectionView alloc] initWithFrame:NSMakeRect(0, 0, imageListWidth, _splitView.frame.size.height)];
         _mainCollection.wantsLayer = YES;
         _mainCollection.collectionViewLayout = flowLayout;
-        _mainCollection.layer.backgroundColor = [NSColor redColor].CGColor;
+//        _mainCollection.layer.backgroundColor = [NSColor redColor].CGColor;
         _mainCollection.selectable = YES;
         _mainCollection.delegate = self;
         _mainCollection.dataSource = self;
@@ -73,6 +78,10 @@
 }
 
 - (void)creatUI {
+    
+    JXSelectFileView *fileView = [[JXSelectFileView alloc] initWithFrame:NSMakeRect(0, self.view.frame.size.height-FileViewHeight, self.view.frame.size.width, FileViewHeight)];
+    [self.view addSubview:fileView];
+    
     NSScrollView *tableContainerView = [[NSScrollView alloc] initWithFrame:self.mainCollection.bounds];
     tableContainerView.hasVerticalScroller = YES;
     NSClipView *clip = [[NSClipView alloc] initWithFrame:self.mainCollection.bounds];
@@ -85,20 +94,25 @@
     JXCameraView *caView = [[JXCameraView alloc] initWithFrame:NSMakeRect(0, 0, self.view.frame.size.width-imageListWidth-FWidth, _splitView.frame.size.height)];
     caView.photoClickBlock = ^{
         [[CameraManager sharedManager] getPhotoImage:^(NSImage * _Nonnull image) {
-            [weakSelf.dataArray addObject:image];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf.mainCollection reloadData];
-            });
+            JXImageModel *model = [JXImageModel new];
+            model.imageData = image;
+            [CameraManager sharedManager].getImageName = ^(NSString * _Nonnull fileName) {
+                model.fileName = fileName;
+                [weakSelf.dataArray addObject:model];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf.mainCollection reloadData];
+                    weakSelf.fListView.imageNameLast.text = [NSString stringWithFormat:@"+%@",[CameraManager sharedManager].imageLastName];
+                });
+            };
         }];
     };
     [self.splitView addArrangedSubview:caView];
     [self.view addSubview:self.splitView];
     
-    JXFunctionListView *fListView = [[JXFunctionListView alloc] initWithFrame:NSMakeRect(self.view.frame.size.width-FWidth, 0, FWidth, self.view.frame.size.height)];
-    [self.view addSubview:fListView];
+    self.fListView = [[JXFunctionListView alloc] initWithFrame:NSMakeRect(self.view.frame.size.width-FWidth, 0, FWidth, self.view.frame.size.height - FileViewHeight)];
+    [self.view addSubview:self.fListView];
     
-     [[NSFileManager defaultManager] URLsForDirectory:NSDesktopDirectory inDomains:NSUserDomainMask];
-    
+    [[NSFileManager defaultManager] URLsForDirectory:NSDesktopDirectory inDomains:NSUserDomainMask];
 }
 
 #pragma mark NSSplitViewDelegate
@@ -124,14 +138,13 @@
 }
 
 #pragma mark NSCollectionViewDelegate
-//个数
 -(NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
     return self.dataArray.count;
 }
 //内容
 -(NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath{
     JXImageDataItem *item = [collectionView makeItemWithIdentifier:@"JXImageDataItem" forIndexPath:indexPath];
-    item.image = self.dataArray[indexPath.item];
+    item.model = self.dataArray[indexPath.item];
     item.view.layer.backgroundColor = NSColor.whiteColor.CGColor;
     return item;
 }

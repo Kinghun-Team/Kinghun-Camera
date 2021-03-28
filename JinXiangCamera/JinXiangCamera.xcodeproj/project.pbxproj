@@ -19,6 +19,9 @@
 		1862C81B25B37128005AF08A /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1862C81A25B37128005AF08A /* CoreImage.framework */; };
 		1862C81D25B37131005AF08A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1862C81C25B37131005AF08A /* CoreGraphics.framework */; };
 		1862C82625B371C7005AF08A /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1862C82525B371C7005AF08A /* IOKit.framework */; };
+		18656EC02609F7F500538312 /* JXSelectFileView.m in Sources */ = {isa = PBXBuildFile; fileRef = 18656EBF2609F7F500538312 /* JXSelectFileView.m */; };
+		18656F26260F429200538312 /* JXImageModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 18656F25260F429100538312 /* JXImageModel.m */; };
+		18656F31260F8C6A00538312 /* NSButton+JXExpand.m in Sources */ = {isa = PBXBuildFile; fileRef = 18656F30260F8C6900538312 /* NSButton+JXExpand.m */; };
 		1879B13525A1C98E00CCC6F1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1879B13425A1C98E00CCC6F1 /* AppDelegate.m */; };
 		1879B13A25A1C99100CCC6F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1879B13925A1C99100CCC6F1 /* Assets.xcassets */; };
 		1879B13D25A1C99100CCC6F1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1879B13B25A1C99100CCC6F1 /* Main.storyboard */; };
@@ -73,6 +76,12 @@
 		1862C81C25B37131005AF08A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		1862C82125B37163005AF08A /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		1862C82525B371C7005AF08A /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		18656EBE2609F7F500538312 /* JXSelectFileView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXSelectFileView.h; sourceTree = "<group>"; };
+		18656EBF2609F7F500538312 /* JXSelectFileView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JXSelectFileView.m; sourceTree = "<group>"; };
+		18656F24260F429100538312 /* JXImageModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXImageModel.h; sourceTree = "<group>"; };
+		18656F25260F429100538312 /* JXImageModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JXImageModel.m; sourceTree = "<group>"; };
+		18656F2F260F8C6900538312 /* NSButton+JXExpand.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSButton+JXExpand.h"; sourceTree = "<group>"; };
+		18656F30260F8C6900538312 /* NSButton+JXExpand.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSButton+JXExpand.m"; sourceTree = "<group>"; };
 		1879B13025A1C98E00CCC6F1 /* JinXiangCamera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JinXiangCamera.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1879B13325A1C98E00CCC6F1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1879B13425A1C98E00CCC6F1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -152,6 +161,8 @@
 			children = (
 				1862C7E225B35358005AF08A /* button */,
 				1862C7CD25B21572005AF08A /* Label */,
+				18656F2F260F8C6900538312 /* NSButton+JXExpand.h */,
+				18656F30260F8C6900538312 /* NSButton+JXExpand.m */,
 			);
 			path = Custom;
 			sourceTree = "<group>";
@@ -172,6 +183,15 @@
 				1862C7E425B353BB005AF08A /* CustomButton.m */,
 			);
 			path = button;
+			sourceTree = "<group>";
+		};
+		18656F23260F425F00538312 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				18656F24260F429100538312 /* JXImageModel.h */,
+				18656F25260F429100538312 /* JXImageModel.m */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		1879B12725A1C98E00CCC6F1 = {
@@ -236,6 +256,7 @@
 				1862C7C625B212DD005AF08A /* Custom */,
 				1879B17F25A1D9E300CCC6F1 /* BaseViewController */,
 				1879B16E25A1CC3E00CCC6F1 /* ViewController */,
+				18656F23260F425F00538312 /* Model */,
 				1879B16F25A1CC5100CCC6F1 /* View */,
 			);
 			path = UI;
@@ -272,6 +293,8 @@
 				1862C7D825B2E2AD005AF08A /* JXCameraView.m */,
 				188B1C6125CDB51800246C8E /* JXFunctionListView.h */,
 				188B1C6225CDB51800246C8E /* JXFunctionListView.m */,
+				18656EBE2609F7F500538312 /* JXSelectFileView.h */,
+				18656EBF2609F7F500538312 /* JXSelectFileView.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -442,8 +465,11 @@
 				1879B17225A1CCC900CCC6F1 /* JXRootViewController.m in Sources */,
 				1879B13525A1C98E00CCC6F1 /* AppDelegate.m in Sources */,
 				18C80EDE25B3FF71001617D0 /* NSImage+OpenCV.mm in Sources */,
+				18656F31260F8C6A00538312 /* NSButton+JXExpand.m in Sources */,
 				18C80EE425B3FF7B001617D0 /* CameraManager.mm in Sources */,
+				18656F26260F429200538312 /* JXImageModel.m in Sources */,
 				1879B18325A1DA1A00CCC6F1 /* JXBaseViewController.m in Sources */,
+				18656EC02609F7F500538312 /* JXSelectFileView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

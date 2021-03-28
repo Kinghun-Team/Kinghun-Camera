@@ -14,12 +14,14 @@
 
 @implementation JXImageDataItem
 
-- (void)setImage:(NSImage *)image {
-    _image = image;
+- (void)setModel:(JXImageModel *)model {
+    _model = model;
     
     JXImageDataView *view = (JXImageDataView *)self.view;
-    view.image = image;
+    view.image = model.imageData;
+    view.fileName = model.fileName;
 }
+
 
 - (void)loadView {
     self.view = [[JXImageDataView alloc] initWithFrame: NSMakeRect(0, 0, imageListWidth, imageCellHeight)];

@@ -29,6 +29,12 @@
     self.imageView.image = image;
 }
 
+- (void)setFileName:(NSString *)fileName {
+    _fileName = fileName;
+    
+    self.label.text = fileName;
+}
+
 - (instancetype)initWithFrame:(NSRect)frame
 {
     self = [super initWithFrame:frame];
@@ -46,7 +52,6 @@
 //        self.label.textAlignment = NSTextAlignmentCenter;
         self.label.font = [NSFont boldSystemFontOfSize:15];
         [self addSubview:self.label];
-        self.label.text = @"测试图片";
     }
     return self;
 }

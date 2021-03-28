@@ -18,6 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) cv::Mat CVMat;
 @property(nonatomic, readonly) cv::Mat CVGrayscaleMat;
 
+- (CGImageRef)CGImage;
++ (NSImage *)systemImageToGrayImage:(NSImage *)image;
+- (NSImage*)imageToGrayImage:(NSImage*)image;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface JXFunctionListView : NSView
 
+@property(nonatomic,strong)JHLabel *imageNameLast;
+
 @end
 
 NS_ASSUME_NONNULL_END

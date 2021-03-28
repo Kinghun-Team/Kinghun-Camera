@@ -11,6 +11,7 @@
 #import <opencv2/imgproc.hpp>
 #pragma clang diagnostic pop
 #import "CameraManager.h"
+#import "NSImage+OpenCV.h"
 
 #define cameraManager   [CameraManager sharedManager]
 
@@ -36,11 +37,39 @@ typedef void(^GetImage)(NSImage *iamge);
 @property (nonatomic ,strong) AVCaptureVideoPreviewLayer *previewLayer;
 
 @property (nonatomic,assign) CGFloat imageWidth;//图片高度  图片比例9：16
-@property(nonatomic,assign)BOOL getPhoto;//获取图片
+@property (nonatomic,assign) BOOL getPhoto;//获取图片
+
+@property (nonatomic,strong) NSString *fileName;
+@property (nonatomic,strong) NSString *fileType;
+
+@property (nonatomic,strong) NSDictionary *rgbOutputSettings;
+
+@property (nonatomic,assign) ImageType imageType;//图片文件类型
+
+@property (nonatomic,assign) ImageFileName fileNameType;
+
+@property (nonatomic,strong) NSDateFormatter *formatter;
 
 @end
 
 @implementation CameraManager
+
+- (void)setImageFirstName:(NSString *)imageFirstName {
+    _imageFirstName = imageFirstName;
+    
+    self.imageCount = 1;
+    NSString *t = [NSString stringWithFormat:@"%@%ld",@"0000000",self.imageCount];
+    NSRange ange = {t.length-6,6};
+    self.imageLastName = [t substringWithRange:ange];
+}
+
+- (NSDateFormatter *)formatter {
+    if (!_formatter) {
+        _formatter = [[NSDateFormatter alloc] init];
+        _formatter.dateFormat = @"yyyyMMddHHmmssSSS";
+    }
+    return _formatter;
+}
 
 + (NSArray *)cameraDevice {
     NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
@@ -78,9 +107,15 @@ typedef void(^GetImage)(NSImage *iamge);
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedManager = [[CameraManager alloc] init];
-        sharedManager.imageType = IMGPNG;
+        [sharedManager choiceImageType:IMGPNG];
         sharedManager.imageSize = imageSize1920;
         sharedManager.searchPath = NSDownloadsDirectory;
+        sharedManager.imageColor = GrayColor;
+        sharedManager.imageCount = 1;
+        sharedManager.imageFirstName = @"IMG";
+        sharedManager.imageLastName = @"000001";
+        [sharedManager setImageName:FileDate];
+        sharedManager.isSystemFileSave = YES;
     });
     return sharedManager;
 }
@@ -112,9 +147,7 @@ typedef void(^GetImage)(NSImage *iamge);
     self.videoDataOutputQueue = dispatch_queue_create(FYFVideoDataOutputQueue, DISPATCH_QUEUE_SERIAL);
     // 5.输出流(从指定的视频中采集数据)
     self.videoDataOutput = [[AVCaptureVideoDataOutput alloc] init];
-    //   设置采集相片的像素格式
-    NSDictionary *rgbOutputSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCMPixelFormat_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey];
-    [self.videoDataOutput setVideoSettings:rgbOutputSettings];
+    [self setCameraRGBType:self.imageColor];
     //   处理输出线程被阻塞时，丢弃掉没有处理的画面
     [self.videoDataOutput setAlwaysDiscardsLateVideoFrames:YES];
     [self.videoDataOutput setSampleBufferDelegate:self queue:self.videoDataOutputQueue];
@@ -140,6 +173,23 @@ typedef void(^GetImage)(NSImage *iamge);
 //    }
 }
 
+- (void)setImageName:(ImageFileName)fileNameType {
+    self.fileNameType = fileNameType;
+}
+
+- (void)setCameraRGBType:(ImageModel)imageRGB {
+    //   设置采集相片的像素格式
+    if (imageRGB == Colour) {
+        self.rgbOutputSettings = @{(id)kCVPixelBufferPixelFormatTypeKey:@(kCMPixelFormat_32BGRA)};
+    } else if (imageRGB == GrayColor) {
+        self.rgbOutputSettings = @{(id)kCVPixelBufferPixelFormatTypeKey:@(kCMPixelFormat_32BGRA)};
+//        self.rgbOutputSettings = @{(id)kCVPixelBufferPixelFormatTypeKey:@(kCMPixelFormat_422YpCbCr8_yuvs)};
+    } else {
+        self.rgbOutputSettings = @{(id)kCVPixelBufferPixelFormatTypeKey:@(kCMPixelFormat_32BGRA)};
+    }
+    self.imageColor = imageRGB;
+    [self.videoDataOutput setVideoSettings:self.rgbOutputSettings];
+}
 
 - (void)start {
     if (self.device == nil) {
@@ -185,18 +235,23 @@ typedef void(^GetImage)(NSImage *iamge);
 //    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 //    dispatch_async(queue, ^{
 //    });
-    NSImage *iamge = [self convertSameBufferToNSImage:sampleBuffer];
-    
+    NSImage *image = [self convertSameBufferToNSImage:sampleBuffer];
+    if (self.imageColor == GrayColor) {
+//        image = [NSImage systemImageToGrayImage:image];
+//        image = [image imageToGrayImage:image];
+    } else if (self.imageColor == GrayColor) {
+        
+    }
 //    image = [[UIImage alloc]initWithCGImage:image.CGImage scale:1.0f orientation:imgOrientation];
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(cameraBufferIamge:)]) {
-            [self.delegate cameraBufferIamge:iamge];
+            [self.delegate cameraBufferIamge:image];
         }
     });
     if (self.getPhoto == YES) {//获取帧
         self.getPhoto = NO;
-        getImage(iamge);
-        [self saveImage:iamge];
+        getImage(image);
+        [self saveImage:image];
     }
 }
 
@@ -214,8 +269,10 @@ typedef void(^GetImage)(NSImage *iamge);
     size_t height = CVPixelBufferGetHeight(imageBuffer);
     // 创建一个依赖于设备的RGB颜色空间
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+//    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
     // 用抽样缓存的数据创建一个位图格式的图形上下文（graphics context）对象
     CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+//    CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGImageAlphaNone);
     // 根据这个位图context中的像素数据创建一个Quartz image对象
     CGImageRef quartzImage = CGBitmapContextCreateImage(context);
     // 解锁pixel buffer
@@ -242,24 +299,9 @@ typedef void(^GetImage)(NSImage *iamge);
     }
     // 用Quartz image创建一个UIImage对象image
     NSImage *image = [[NSImage alloc] initWithCGImage:quartzImage size:NSMakeSize(self.imageWidth*16.0/9.0, self.imageWidth)];
-    
     // 释放Quartz image对象
     CGImageRelease(quartzImage);
-    return (image);
-}
-
-- (NSImage *)mirrorImage:(NSImage *)originImage{
-//    CGRect rect = CGRectMake(0, 0, originImage.size.width , originImage.size.height);
-//    UIGraphicsBeginImageContextWithOptions(rect.size, false, 2);
-//    CGContextRef currentContext =  UIGraphicsGetCurrentContext();
-//    CGContextClipToRect(currentContext, rect);
-//    CGContextRotateCTM(currentContext, M_PI);
-//    CGContextTranslateCTM(currentContext, -rect.size.width, -rect.size.height);
-//    CGContextDrawImage(currentContext, rect, originImage.CGImage);
-//    UIImage* drawImage =  UIGraphicsGetImageFromCurrentImageContext();
-//    return [UIImage imageWithCGImage:drawImage.CGImage scale:originImage.scale orientation:originImage.imageOrientation];
-//    [[NSImage alloc] initWithDataIgnoringOrientation:originImage];
-    return originImage;
+    return image;
 }
 
 - (void)photoSetImage:(NSImageView *)imageView {
@@ -282,6 +324,26 @@ typedef void(^GetImage)(NSImage *iamge);
     }];
 }
 
+- (void)choiceImageType:(ImageType)type {
+    self.imageType = type;
+    switch (self.imageType) {
+        case IMGPNG:
+            self.fileType = @"png";
+            break;
+        case IMGJPG:
+            self.fileType = @"jpg";
+            break;
+        case IMGTIF:
+            self.fileType = @"TIF";
+            break;
+        case IMGBMP:
+            self.fileType = @"BMP";
+            break;
+        default:
+            break;
+    }
+}
+
 #pragma - 保存图片
 - (void)saveImage:(NSImage *)image {
     [image lockFocus];
@@ -292,36 +354,47 @@ typedef void(^GetImage)(NSImage *iamge);
     NSDictionary *imageProps = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:0] forKey:NSImageCompressionFactor];
     //之后 转化为NSData 以便存到文件中
     NSBitmapImageFileType imageType = NSPNGFileType;
-    NSString *fileType = @"png";
     switch (self.imageType) {
         case IMGPNG:
             imageType = NSPNGFileType;
-            fileType = @"png";
             break;
         case IMGJPG:
             imageType = NSBitmapImageFileTypeJPEG;
-            fileType = @"jpg";
             break;
         case IMGTIF:
             imageType = NSBitmapImageFileTypeTIFF;
-            fileType = @"TIF";
             break;
         case IMGBMP:
             imageType = NSBitmapImageFileTypeBMP;
-            fileType = @"BMP";
             break;
         default:
             break;
     }
-    
+    if (self.fileNameType == FileDate) {
+        self.fileName = [self.formatter stringFromDate:[NSDate date]];
+    } else {
+        NSString *t = [NSString stringWithFormat:@"%@%ld",@"0000000",self.imageCount];
+        NSRange ange = {t.length-6,6};
+        self.fileName = [NSString stringWithFormat:@"%@%@",self.imageFirstName,[t substringWithRange:ange]];
+        self.imageLastName = [[NSString stringWithFormat:@"%@%ld",@"0000000",self.imageCount+=1] substringWithRange:ange];
+    }
     NSData *imageData = [bits representationUsingType:imageType properties:imageProps];
     NSURL *url = [[NSFileManager defaultManager] URLsForDirectory:self.searchPath inDomains:NSUserDomainMask].firstObject;
-    [self createFile:[NSString stringWithFormat:@"photoTest.%@",fileType] withUrl:url withFileData:imageData];
+    [self createFile:[NSString stringWithFormat:@"%@.%@",self.fileName,self.fileType] withUrl:url withFileData:imageData];
 }
 
 - (void)createFile:(NSString *)name withUrl:(NSURL *)fileBaseUrl withFileData:(NSData *)data {
-    NSURL *file = [fileBaseUrl URLByAppendingPathComponent:name];
-    BOOL isSuccess = [data writeToFile:[file.path stringByExpandingTildeInPath] atomically:YES];
+    if (self.getImageName) {
+        self.getImageName(name);
+    }
+    NSString *path;
+    if (self.isSystemFileSave == YES) {
+        NSURL *file = [fileBaseUrl URLByAppendingPathComponent:name];
+        path = file.path;
+    } else {
+        path = [self.userFilePath stringByAppendingFormat:@"/%@", name];
+    }
+    BOOL isSuccess = [data writeToFile:[path stringByExpandingTildeInPath] atomically:YES];
     NSLog(@"Save Image: %d", isSuccess);
 }
 

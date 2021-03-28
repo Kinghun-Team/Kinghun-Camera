@@ -13,7 +13,7 @@
 #define     mainScreendWidth     1200
 #define     mainScreendHeight    700
 
-#define     imageListWidth  240
-#define     imageCellHeight 205
+#define     imageListWidth  220
+#define     imageCellHeight 185
 
 #endif /* Header_h */
