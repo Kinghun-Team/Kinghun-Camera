@@ -49,6 +49,10 @@
         self.photoButton.action = @selector(photoClick);
         [self addSubview:self.photoButton];
         
+        
+//        UIImage *flipImage = [UIImage imageWithCGImage:backImage.image.CGImage scale:backImage.image.scale orientation:UIImageOrientationLeftMirrored];
+//            backImage.image = flipImage;
+        
         [CameraManager sharedManager].allCamera = YES;
         [CameraManager sharedManager].delegate = self;
         [[CameraManager sharedManager] start];

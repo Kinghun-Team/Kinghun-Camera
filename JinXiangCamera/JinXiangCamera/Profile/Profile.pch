@@ -10,6 +10,7 @@
 
 #import <AVFoundation/AVFoundation.h>
 #import "CameraManager.h"
+#import "FileManager.h"
 #import "Header.h"
 #import "JHLabel.h"
 #import "NSButton+JXExpand.h"

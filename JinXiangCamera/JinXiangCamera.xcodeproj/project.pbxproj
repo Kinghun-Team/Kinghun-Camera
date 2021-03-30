@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1819D8FD2613000500242493 /* FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1819D8FC2613000500242493 /* FileManager.m */; };
 		1862C78225A4C1F9005AF08A /* JXImageDataView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1862C78125A4C1F9005AF08A /* JXImageDataView.m */; };
 		1862C7C925B212F1005AF08A /* JHLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1862C7C825B212F0005AF08A /* JHLabel.m */; };
 		1862C7D925B2E2AD005AF08A /* JXCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1862C7D825B2E2AD005AF08A /* JXCameraView.m */; };
@@ -56,6 +57,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1819D8FB2613000500242493 /* FileManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileManager.h; sourceTree = "<group>"; };
+		1819D8FC2613000500242493 /* FileManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FileManager.m; sourceTree = "<group>"; };
 		1862C78025A4C1F9005AF08A /* JXImageDataView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXImageDataView.h; sourceTree = "<group>"; };
 		1862C78125A4C1F9005AF08A /* JXImageDataView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JXImageDataView.m; sourceTree = "<group>"; };
 		1862C78D25AC9186005AF08A /* Automator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Automator.framework; path = System/Library/Frameworks/Automator.framework; sourceTree = SDKROOT; };
@@ -269,6 +272,8 @@
 				18C80EE225B3FF7A001617D0 /* CameraManager.mm */,
 				18C80EDC25B3FF70001617D0 /* NSImage+OpenCV.h */,
 				18C80EDD25B3FF71001617D0 /* NSImage+OpenCV.mm */,
+				1819D8FB2613000500242493 /* FileManager.h */,
+				1819D8FC2613000500242493 /* FileManager.m */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -458,6 +463,7 @@
 				1862C7E525B353BC005AF08A /* CustomButton.m in Sources */,
 				1862C7C925B212F1005AF08A /* JHLabel.m in Sources */,
 				1862C7D925B2E2AD005AF08A /* JXCameraView.m in Sources */,
+				1819D8FD2613000500242493 /* FileManager.m in Sources */,
 				1879B14025A1C99100CCC6F1 /* main.m in Sources */,
 				188B1C5A25CD9B1A00246C8E /* JXImageDataItem.m in Sources */,
 				1862C78225A4C1F9005AF08A /* JXImageDataView.m in Sources */,

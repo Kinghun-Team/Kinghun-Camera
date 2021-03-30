@@ -96,12 +96,12 @@
         [[CameraManager sharedManager] getPhotoImage:^(NSImage * _Nonnull image) {
             JXImageModel *model = [JXImageModel new];
             model.imageData = image;
-            [CameraManager sharedManager].getImageName = ^(NSString * _Nonnull fileName) {
+            [FileManager sharedManager].getImageName = ^(NSString * _Nonnull fileName) {
                 model.fileName = fileName;
                 [weakSelf.dataArray addObject:model];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [weakSelf.mainCollection reloadData];
-                    weakSelf.fListView.imageNameLast.text = [NSString stringWithFormat:@"+%@",[CameraManager sharedManager].imageLastName];
+                    weakSelf.fListView.imageNameLast.text = [NSString stringWithFormat:@"+%@",[FileManager sharedManager].imageLastName];
                 });
             };
         }];

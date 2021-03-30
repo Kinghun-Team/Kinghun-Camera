@@ -73,7 +73,7 @@
     NSScrollView *tableContainerView = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, self.frame.size.height-120, self.frame.size.width, 120)];
     tableContainerView.hasVerticalScroller = YES;
     
-    self.cameraTab = [[NSTableView alloc] initWithFrame: tableContainerView.bounds];
+    self.cameraTab = [[NSTableView alloc] initWithFrame:tableContainerView.bounds];
     self.cameraTab.draggingDestinationFeedbackStyle = NSTableViewDraggingDestinationFeedbackStyleSourceList;
     self.cameraTab.delegate = self;
     self.cameraTab.rowHeight = 25;
@@ -157,7 +157,7 @@
     
     self.textField = [[NSTextField alloc] initWithFrame:CGRectMake(20, self.customImage.frame.origin.y-self.customImage.frame.size.height-5, 80, 26)];
     self.textField.backgroundColor = [NSColor clearColor];
-    self.textField.stringValue = [CameraManager sharedManager].imageFirstName;
+    self.textField.stringValue = [FileManager sharedManager].imageFirstName;
     [[self.textField cell] setScrollable:YES];
     self.textField.delegate = self;
     self.textField.focusRingType = NSFocusRingTypeNone;
@@ -170,7 +170,7 @@
     self.imageNameLast.backgroundColor = [NSColor clearColor];
     self.imageNameLast.font = [NSFont systemFontOfSize:13];
     [self addSubview:self.imageNameLast];
-    self.imageNameLast.text = [NSString stringWithFormat:@"+%@",[CameraManager sharedManager].imageLastName];
+    self.imageNameLast.text = [NSString stringWithFormat:@"+%@",[FileManager sharedManager].imageLastName];
     
     JHLabel *colorModeLabel = [[JHLabel alloc] initWithFrame:NSMakeRect(10, self.frame.size.height-360, 100, 20)];
     colorModeLabel.wantsLayer = YES;
@@ -216,41 +216,38 @@
 
 - (void)dateClick:(NSButton *)button {
     [button setState:NSGestureRecognizerStateBegan];
-    [[CameraManager sharedManager] setImageName:FileDate];
+    [[FileManager sharedManager] setImageName:FileDate];
     [self.customImage setState:NSGestureRecognizerStatePossible];
 }
 
 - (void)customClick:(NSButton *)button {
     [button setState:NSGestureRecognizerStateBegan];
-    [[CameraManager sharedManager] setImageName:FileCustom];
+    [[FileManager sharedManager] setImageName:FileCustom];
     [self.dateImage setState:NSGestureRecognizerStatePossible];
 }
 
 - (void)colorClick:(NSButton *)button {
     [button setState:NSGestureRecognizerStateBegan];
-    
     [self.grayscaleBtn setState:NSGestureRecognizerStatePossible];
     [self.blackAndWhiteBtn setState:NSGestureRecognizerStatePossible];
     
-    [CameraManager sharedManager].imageColor = Colour;
+    [[CameraManager sharedManager] setCameraRGBType:Colour];
 }
 
 - (void)grayClick:(NSButton *)button {
     [button setState:NSGestureRecognizerStateBegan];
-    
     [self.colourBtn setState:NSGestureRecognizerStatePossible];
     [self.blackAndWhiteBtn setState:NSGestureRecognizerStatePossible];
     
-    [CameraManager sharedManager].imageColor = GrayColor;
+    [[CameraManager sharedManager] setCameraRGBType:GrayColor];
 }
 
 - (void)blackClick:(NSButton *)button {
     [button setState:NSGestureRecognizerStateBegan];
-    
     [self.colourBtn setState:NSGestureRecognizerStatePossible];
     [self.grayscaleBtn setState:NSGestureRecognizerStatePossible];
     
-    [CameraManager sharedManager].imageColor = blackAndWhite;
+//    [CameraManager sharedManager].imageColor = blackAndWhite;
 }
 
 #pragma mark - NSTextFieldDelegate
@@ -266,8 +263,8 @@
     if (self.textField.stringValue.length > accountMaxLimit) {
         self.textField.stringValue = [self.textField.stringValue substringToIndex:accountMaxLimit];
     }
-    [CameraManager sharedManager].imageFirstName = self.textField.stringValue;
-    self.imageNameLast.text = [NSString stringWithFormat:@"+%@",[CameraManager sharedManager].imageLastName];
+    [FileManager sharedManager].imageFirstName = self.textField.stringValue;
+    self.imageNameLast.text = [NSString stringWithFormat:@"+%@",[FileManager sharedManager].imageLastName];
 }
 
 - (void)findCamera {
@@ -354,16 +351,16 @@
     if (comboBox.tag == typeTag) {
         switch (selectedIndex) {
             case 0:
-                [[CameraManager sharedManager] choiceImageType:IMGPNG];
+                [[FileManager sharedManager] choiceImageType:IMGPNG];
                 break;
             case 1:
-                [[CameraManager sharedManager] choiceImageType:IMGJPG];
+                [[FileManager sharedManager] choiceImageType:IMGJPG];
                 break;
             case 2:
-                [[CameraManager sharedManager] choiceImageType:IMGTIF];
+                [[FileManager sharedManager] choiceImageType:IMGTIF];
                 break;
             case 3:
-                [[CameraManager sharedManager] choiceImageType:IMGBMP];
+                [[FileManager sharedManager] choiceImageType:IMGBMP];
                 break;
             default:
                 break;

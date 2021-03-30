@@ -50,75 +50,64 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     return dstImage;
 }
 
-- (NSImage*)imageToGrayImage:(NSImage*)image {
-    // 1.将iOS的UIImage转成cv::Mat
-    cv::Mat mat_image = [self cvMatFromUIImage:image];
-    // 2. 将cv::Mat转成更改后的UIImage
-    NSImage * img = [self UIImageFromCVMat:mat_image];
-    return img;
-}
-
-//UIImage To cv::Mat:
-- (cv::Mat)cvMatFromUIImage:(NSImage *)image
-{
-    CGColorSpaceRef colorSpace = CGImageGetColorSpace(image.CGImage);
-    CGFloat cols = image.size.width;
-    CGFloat rows = image.size.height;
-    
-    cv::Mat cvMat(rows, cols, CV_8UC4); // 8 bits per component, 4 channels (color channels + alpha)
-    
-    CGContextRef contextRef = CGBitmapContextCreate(cvMat.data,                 // Pointer to  data
-                                                    cols,                       // Width of bitmap
-                                                    rows,                       // Height of bitmap
-                                                    8,                          // Bits per component
-                                                    cvMat.step[0],              // Bytes per row
-                                                    colorSpace,                 // Colorspace
-                                                    kCGImageAlphaNoneSkipLast |
-                                                    kCGBitmapByteOrderDefault); // Bitmap info flags
-    
-    CGContextDrawImage(contextRef, CGRectMake(0, 0, cols, rows), image.CGImage);
-    CGContextRelease(contextRef);
-    
-    return cvMat;
-}
-
-//cv::Mat To UIImage:
--(NSImage *)UIImageFromCVMat:(cv::Mat)cvMat
-{
-    NSData *data = [NSData dataWithBytes:cvMat.data length:cvMat.elemSize()*cvMat.total()];
-    CGColorSpaceRef colorSpace;
-    
-//    if (cvMat.elemSize() == 1) {//可以根据这个决定使用哪种
-//        colorSpace = CGColorSpaceCreateDeviceGray();
-//    } else {
-//        colorSpace = CGColorSpaceCreateDeviceRGB();
-//    }
-    
-    colorSpace = CGColorSpaceCreateDeviceGray();
-
-    CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)data);
-    
-    // Creating CGImage from cv::Mat
-    CGImageRef imageRef = CGImageCreate(cvMat.cols,                                 //width
-                                        cvMat.rows,                                 //height
-                                        8,                                          //bits per component
-                                        8 * cvMat.elemSize(),                       //bits per pixel
-                                        cvMat.step[0],                            //bytesPerRow
-                                        colorSpace,                                 //colorspace
-                                        kCGImageAlphaNone|kCGBitmapByteOrderDefault,// bitmap info
-                                        provider,                                   //CGDataProviderRef
-                                        NULL,                                       //decode
-                                        false,                                      //should interpolate
-                                        kCGRenderingIntentDefault                   //intent
-                                        );
-    // Getting UIImage from CGImage
-//    UIImage *finalImage = [UIImage imageWithCGImage:imageRef];
-    NSImage *finalImage = [[NSImage alloc] initWithCGImage:imageRef size:CGSizeMake(cvMat.cols, cvMat.rows)];
-    CGImageRelease(imageRef);
-    CGDataProviderRelease(provider);
++ (NSImage *)colorSameBufferImage:(CMSampleBufferRef)sampleBuffer withSize:(NSSize)size {
+    // 为媒体数据设置一个CMSampleBuffer的Core Video图像缓存对象
+    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    // 锁定pixel buffer的基地址
+    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+    // 得到pixel buffer的基地址
+    void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
+    // 得到pixel buffer的行字节数
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+    // 得到pixel buffer的宽和高
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+    // 创建一个依赖于设备的RGB颜色空间
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    // 用抽样缓存的数据创建一个位图格式的图形上下文（graphics context）对象
+    CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    // 根据这个位图context中的像素数据创建一个Quartz image对象
+    CGImageRef quartzImage = CGBitmapContextCreateImage(context);
+    // 解锁pixel buffer
+    CVPixelBufferUnlockBaseAddress(imageBuffer,0);
+    // 释放context和颜色空间
+    CGContextRelease(context);
     CGColorSpaceRelease(colorSpace);
-    
-    return finalImage;
+    // 用Quartz image创建一个UIImage对象image
+    NSImage *image = [[NSImage alloc] initWithCGImage:quartzImage size:size];
+    // 释放Quartz image对象
+    CGImageRelease(quartzImage);
+    return image;
+}
+
++ (NSImage *)graySameBufferImage:(CMSampleBufferRef)sampleBuffer withSize:(NSSize)size {
+    // 为媒体数据设置一个CMSampleBuffer的Core Video图像缓存对象
+    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    // 锁定pixel buffer的基地址
+    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+    // 得到pixel buffer的基地址
+    void *baseAddress = CVPixelBufferGetBaseAddressOfPlane(imageBuffer,0);
+    // 得到pixel buffer的行字节数
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer,0);
+    // 得到pixel buffer的宽和高
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+    // 创建一个依赖于设备的RGB颜色空间
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
+    // 用抽样缓存的数据创建一个位图格式的图形上下文（graphics context）对象
+    CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGImageAlphaNone);
+    // 根据这个位图context中的像素数据创建一个Quartz image对象
+    CGImageRef quartzImage = CGBitmapContextCreateImage(context);
+    // 解锁pixel buffer
+    CVPixelBufferUnlockBaseAddress(imageBuffer,0);
+    // 释放context和颜色空间
+    CGContextRelease(context);
+    CGColorSpaceRelease(colorSpace);
+    // 用Quartz image创建一个UIImage对象image
+    NSImage *image = [[NSImage alloc] initWithCGImage:quartzImage size:size];
+    // 释放Quartz image对象
+    CGImageRelease(quartzImage);
+    return image;
 }
 
 

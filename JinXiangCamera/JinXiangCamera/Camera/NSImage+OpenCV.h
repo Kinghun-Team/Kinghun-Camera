@@ -20,7 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (CGImageRef)CGImage;
 + (NSImage *)systemImageToGrayImage:(NSImage *)image;
-- (NSImage*)imageToGrayImage:(NSImage*)image;
+
++ (NSImage *)colorSameBufferImage:(CMSampleBufferRef)sampleBuffer withSize:(NSSize)size;
++ (NSImage *)graySameBufferImage:(CMSampleBufferRef)sampleBuffer withSize:(NSSize)size;
 
 @end
 

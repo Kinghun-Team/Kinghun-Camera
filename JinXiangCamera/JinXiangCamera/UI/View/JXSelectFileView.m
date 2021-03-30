@@ -93,14 +93,14 @@
     NSComboBox *comboBox = notification.object;
     NSInteger selectedIndex = comboBox.indexOfSelectedItem;
     if (selectedIndex == 0) {
-        [CameraManager sharedManager].isSystemFileSave = YES;
-        [CameraManager sharedManager].searchPath = NSDownloadsDirectory;
+        [FileManager sharedManager].isSystemFileSave = YES;
+        [FileManager sharedManager].searchPath = NSDownloadsDirectory;
     } else if (selectedIndex == 1) {
-        [CameraManager sharedManager].isSystemFileSave = YES;
-        [CameraManager sharedManager].searchPath = NSDesktopDirectory;
+        [FileManager sharedManager].isSystemFileSave = YES;
+        [FileManager sharedManager].searchPath = NSDesktopDirectory;
     } else {
-        [CameraManager sharedManager].isSystemFileSave = NO;
-        [CameraManager sharedManager].userFilePath = self.pathArray[selectedIndex];
+        [FileManager sharedManager].isSystemFileSave = NO;
+        [FileManager sharedManager].userFilePath = self.pathArray[selectedIndex];
     }
 }
 
@@ -117,8 +117,8 @@
             [self.pathArray addObject:path];
             [self.selectPath reloadData];
             self.selectPath.stringValue = path;
-            [CameraManager sharedManager].isSystemFileSave = NO;
-            [CameraManager sharedManager].userFilePath = path;
+            [FileManager sharedManager].isSystemFileSave = NO;
+            [FileManager sharedManager].userFilePath = path;
         }
     }
 }
