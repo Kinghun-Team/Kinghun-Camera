@@ -220,7 +220,7 @@ typedef void(^GetImage)(NSImage *image);
     } else if (self.imageColor == GrayColor) {
         image = [NSImage graySameBufferImage:sampleBuffer withSize:size];
     } else {
-        image = [NSImage colorSameBufferImage:sampleBuffer withSize:size];
+        image = [NSImage covertToGrayScaleImage:sampleBuffer withSize:size];
     }
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(cameraBufferIamge:)]) {

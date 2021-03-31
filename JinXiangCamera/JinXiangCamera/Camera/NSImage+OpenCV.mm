@@ -14,7 +14,7 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
 
 @implementation NSImage (OpenCV)
 
-#pragma mark - 灰度处理
+#pragma mark - NSImge灰度处理
 + (NSImage *)systemImageToGrayImage:(NSImage *)image{
     int width  = image.size.width;
     int height = image.size.height;
@@ -43,7 +43,6 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     //释放内存
     CGColorSpaceRelease(colorRef);
     //将c/c++图片转成iOS可显示的图片
-//    NSImage *dstImage = [[NSImage alloc] imageWithCGImage:grayImageRef];
     NSImage *dstImage = [[NSImage alloc] initWithCGImage:grayImageRef size:NSMakeSize(width, height)];
     //释放内存
     CGImageRelease(grayImageRef);
@@ -110,6 +109,115 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     return image;
 }
 
+/**
+ 二值化
+ */
++ (NSImage *)covertToGrayScaleImage:(CMSampleBufferRef)sampleBuffer withSize:(NSSize)size {
+    // 为媒体数据设置一个CMSampleBuffer的Core Video图像缓存对象
+    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    // 锁定pixel buffer的基地址
+    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+    // 得到pixel buffer的基地址
+    void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
+    // 得到pixel buffer的行字节数
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+    // 得到pixel buffer的宽和高
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    
+    CGImageRef quartzImage = CGBitmapContextCreateImage(context);
+    // we're done with the context, color space, and pixels
+    CGContextRelease(context);
+    
+    //像素将画在这个数组
+    uint32_t *pixels = (uint32_t *)malloc(width *height *sizeof(uint32_t));
+    //清空像素数组
+    memset(pixels, 0, width*height*sizeof(uint32_t));
+    
+    CGContextRef WBcontext = CGBitmapContextCreate(pixels, width, height, 8, width*sizeof(uint32_t), colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedLast);
+    CGContextDrawImage(WBcontext, CGRectMake(0, 0, width, height), quartzImage);
+    
+    CGImageRelease(quartzImage);
+    
+    int tt = 1;
+    CGFloat intensity;
+    int bw;
+    
+    for (int y = 0; y <height; y++) {
+        for (int x =0; x <width; x ++) {
+            uint8_t *rgbaPixel = (uint8_t *)&pixels[y*width+x];
+            intensity = (rgbaPixel[tt] + rgbaPixel[tt + 1] + rgbaPixel[tt + 2]) / 3. / 255.;
+            
+            bw = intensity > 0.45?255:0;
+            
+            rgbaPixel[tt] = bw;
+            rgbaPixel[tt + 1] = bw;
+            rgbaPixel[tt + 2] = bw;
+        }
+    }
+    CGImageRef image = CGBitmapContextCreateImage(WBcontext);
+    // 解锁pixel buffer
+    CVPixelBufferUnlockBaseAddress(imageBuffer,0);
+    
+    CGContextRelease(WBcontext);
+    CGColorSpaceRelease(colorSpace);
+    
+    free(pixels);
+    // make a new UIImage to return
+    NSImage *resultUIImage = [[NSImage alloc] initWithCGImage:image size:size];
+    // we're done with image now too
+    CGImageRelease(image);
+    return resultUIImage;
+}
+
+/**
+ NSImage二值化
+ */
+- (NSImage *)covertToGrayScale{
+    CGSize size = [self size];
+    int width = size.width;
+    int height = size.height;
+    //像素将画在这个数组
+    uint32_t *pixels = (uint32_t *)malloc(width *height *sizeof(uint32_t));
+    //清空像素数组
+    memset(pixels, 0, width*height*sizeof(uint32_t));
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    //用 pixels 创建一个 context
+    CGContextRef context = CGBitmapContextCreate(pixels, width, height, 8, width*sizeof(uint32_t), colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedLast);
+    CGContextDrawImage(context, CGRectMake(0, 0, width, height), [self CGImage]);
+    
+    int tt = 1;
+    CGFloat intensity;
+    int bw;
+    
+    for (int y = 0; y <height; y++) {
+        for (int x =0; x <width; x ++) {
+            uint8_t *rgbaPixel = (uint8_t *)&pixels[y*width+x];
+            intensity = (rgbaPixel[tt] + rgbaPixel[tt + 1] + rgbaPixel[tt + 2]) / 3. / 255.;
+            
+            bw = intensity > 0.45?255:0;
+            
+            rgbaPixel[tt] = bw;
+            rgbaPixel[tt + 1] = bw;
+            rgbaPixel[tt + 2] = bw;
+        }
+    }
+    // create a new CGImageRef from our context with the modified pixels
+    CGImageRef quartzImage = CGBitmapContextCreateImage(context);
+    // we're done with the context, color space, and pixels
+    CGContextRelease(context);
+    CGColorSpaceRelease(colorSpace);
+    free(pixels);
+    // make a new UIImage to return
+    NSImage *resultUIImage = [[NSImage alloc] initWithCGImage:quartzImage size:size];
+    // we're done with image now too
+    CGImageRelease(quartzImage);
+    return resultUIImage;
+}
 
 -(CGImageRef)CGImage {
     CGContextRef bitmapCtx = CGBitmapContextCreate(NULL/*data - pass NULL to let CG allocate the memory*/,

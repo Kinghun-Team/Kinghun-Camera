@@ -247,7 +247,7 @@
     [self.colourBtn setState:NSGestureRecognizerStatePossible];
     [self.grayscaleBtn setState:NSGestureRecognizerStatePossible];
     
-//    [CameraManager sharedManager].imageColor = blackAndWhite;
+    [[CameraManager sharedManager] setCameraRGBType:blackAndWhite] ;
 }
 
 #pragma mark - NSTextFieldDelegate
