@@ -14,5 +14,6 @@
 #import "Header.h"
 #import "JHLabel.h"
 #import "NSButton+JXExpand.h"
+#import "SeveData.h"
 
 #endif /* Profile_pch */

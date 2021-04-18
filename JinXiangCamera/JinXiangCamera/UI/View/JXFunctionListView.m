@@ -32,6 +32,8 @@
 @property(nonatomic,strong)NSButton *grayscaleBtn;
 @property(nonatomic,strong)NSButton *blackAndWhiteBtn;
 
+@property(nonatomic,strong)NSButton *photoButton;
+
 @end
 
 @implementation JXFunctionListView
@@ -96,7 +98,12 @@
     self.selectbox.dataSource = self;
     self.selectbox.delegate = self;
     self.selectbox.tag = typeTag+1;
-    [self.selectbox selectItemAtIndex:0];
+    if (FileSeveData.selectSize) {
+        [self.selectbox selectItemAtIndex:FileSeveData.selectSize];
+        [self setImageSizeToIndex:FileSeveData.selectSize];
+    } else {
+        [self.selectbox selectItemAtIndex:0];
+    }
     self.selectbox.editable = NO;
     [self addSubview:self.selectbox];
     
@@ -121,7 +128,12 @@
     self.imageType.backgroundColor = [NSColor whiteColor];
     self.imageType.delegate = self;
     self.imageType.tag = typeTag;
-    [self.imageType selectItemAtIndex:0];
+    if (FileSeveData.selectImageType) {
+        [self.imageType selectItemAtIndex:FileSeveData.selectImageType];
+        [self setImageTypeToIndex:FileSeveData.selectImageType];
+    } else {
+        [self.imageType selectItemAtIndex:0];
+    }
     self.imageType.editable = NO;
     [self addSubview:self.imageType];
     
@@ -212,6 +224,22 @@
     self.blackAndWhiteBtn.action = @selector(blackClick:);
     [self addSubview:self.blackAndWhiteBtn];
     self.blackAndWhiteBtn.frame = NSMakeRect(self.grayscaleBtn.frame.origin.x+self.grayscaleBtn.frame.size.width+5, colorModeLabel.frame.origin.y-colorModeLabel.frame.size.height-15, 60, 30);
+    
+    self.photoButton = [[NSButton alloc] init];
+    self.photoButton.frame = NSMakeRect(self.frame.size.width-50-25, 25, 50, 50);
+    self.photoButton.bezelStyle = NSRoundedBezelStyle;
+    self.photoButton.layer.backgroundColor = [NSColor whiteColor].CGColor;
+    self.photoButton.title = @"拍照";
+    [self.photoButton setTitle:[self.photoButton title] color:[NSColor blackColor] font:12];
+    self.photoButton.target = self;
+    self.photoButton.action = @selector(photoClick);
+    [self addSubview:self.photoButton];
+}
+
+- (void)photoClick {
+    if (self.photoClickBlock) {
+        self.photoClickBlock();
+    }
 }
 
 - (void)dateClick:(NSButton *)button {
@@ -349,42 +377,50 @@
     NSComboBox *comboBox = notification.object;
     NSInteger selectedIndex = comboBox.indexOfSelectedItem;
     if (comboBox.tag == typeTag) {
-        switch (selectedIndex) {
-            case 0:
-                [[FileManager sharedManager] choiceImageType:IMGPNG];
-                break;
-            case 1:
-                [[FileManager sharedManager] choiceImageType:IMGJPG];
-                break;
-            case 2:
-                [[FileManager sharedManager] choiceImageType:IMGTIF];
-                break;
-            case 3:
-                [[FileManager sharedManager] choiceImageType:IMGBMP];
-                break;
-            default:
-                break;
-        }
+        FileSeveData.selectImageType = selectedIndex;
+        [self setImageSizeToIndex:selectedIndex];
     } else {
-        switch (selectedIndex) {
-            case 0:
-                [CameraManager sharedManager].imageSize = imageSize1920;
-                break;
-            case 1:
-                [CameraManager sharedManager].imageSize = imageSize2560;
-                break;
-            case 2:
-                [CameraManager sharedManager].imageSize = imageSize3840;
-                break;
-            case 3:
-                [CameraManager sharedManager].imageSize = imageSize4480;
-                break;
-//            case 4:
-//                [CameraManager sharedManager].imageSize = imageSize3860;
-//                break;
-            default:
-                break;
-        }
+        [CameraManager sharedManager].imageScale = 1.0;
+        FileSeveData.selectSize = selectedIndex;
+        [self setImageTypeToIndex:selectedIndex];
+    }
+}
+
+- (void)setImageSizeToIndex:(NSInteger )index {
+    switch (index) {
+        case 0:
+            [[FileManager sharedManager] choiceImageType:IMGPNG];
+            break;
+        case 1:
+            [[FileManager sharedManager] choiceImageType:IMGJPG];
+            break;
+        case 2:
+            [[FileManager sharedManager] choiceImageType:IMGTIF];
+            break;
+        case 3:
+            [[FileManager sharedManager] choiceImageType:IMGBMP];
+            break;
+        default:
+            break;
+    }
+}
+
+- (void)setImageTypeToIndex:(NSInteger)index {
+    switch (index) {
+        case 0:
+            [CameraManager sharedManager].imageSize = imageSize1920;
+            break;
+        case 1:
+            [CameraManager sharedManager].imageSize = imageSize2560;
+            break;
+        case 2:
+            [CameraManager sharedManager].imageSize = imageSize3840;
+            break;
+        case 3:
+            [CameraManager sharedManager].imageSize = imageSize4480;
+            break;
+        default:
+            break;
     }
 }
 

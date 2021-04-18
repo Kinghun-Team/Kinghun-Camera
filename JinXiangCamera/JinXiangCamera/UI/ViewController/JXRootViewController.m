@@ -90,9 +90,14 @@
     [self.splitView addArrangedSubview:tableContainerView];
     [_mainCollection registerClass:[JXImageDataItem class] forItemWithIdentifier:@"JXImageDataItem"];
     
-    WS(weakSelf)
+    
     JXCameraView *caView = [[JXCameraView alloc] initWithFrame:NSMakeRect(0, 0, self.view.frame.size.width-imageListWidth-FWidth, _splitView.frame.size.height)];
-    caView.photoClickBlock = ^{
+    [self.splitView addArrangedSubview:caView];
+    [self.view addSubview:self.splitView];
+    
+    WS(weakSelf)
+    self.fListView = [[JXFunctionListView alloc] initWithFrame:NSMakeRect(self.view.frame.size.width-FWidth, 0, FWidth, self.view.frame.size.height - FileViewHeight)];
+    self.fListView.photoClickBlock = ^{
         [[CameraManager sharedManager] getPhotoImage:^(NSImage * _Nonnull image) {
             JXImageModel *model = [JXImageModel new];
             model.imageData = image;
@@ -106,10 +111,6 @@
             };
         }];
     };
-    [self.splitView addArrangedSubview:caView];
-    [self.view addSubview:self.splitView];
-    
-    self.fListView = [[JXFunctionListView alloc] initWithFrame:NSMakeRect(self.view.frame.size.width-FWidth, 0, FWidth, self.view.frame.size.height - FileViewHeight)];
     [self.view addSubview:self.fListView];
     
     [[NSFileManager defaultManager] URLsForDirectory:NSDesktopDirectory inDomains:NSUserDomainMask];

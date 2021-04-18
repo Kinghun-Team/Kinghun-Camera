@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic,strong)NSImageView *cameraView;
 
-@property(nonatomic,copy)void(^photoClickBlock)(void);
+
 
 @end
 

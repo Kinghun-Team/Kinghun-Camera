@@ -37,6 +37,7 @@
 		18C80ED225B3FD3C001617D0 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18C80ED125B3FD3C001617D0 /* opencv2.framework */; };
 		18C80EDE25B3FF71001617D0 /* NSImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 18C80EDD25B3FF71001617D0 /* NSImage+OpenCV.mm */; };
 		18C80EE425B3FF7B001617D0 /* CameraManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 18C80EE225B3FF7A001617D0 /* CameraManager.mm */; };
+		18D594C0262C164A009C1B33 /* SeveData.m in Sources */ = {isa = PBXBuildFile; fileRef = 18D594BF262C164A009C1B33 /* SeveData.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,6 +114,8 @@
 		18C80EDD25B3FF71001617D0 /* NSImage+OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSImage+OpenCV.mm"; sourceTree = "<group>"; };
 		18C80EE225B3FF7A001617D0 /* CameraManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraManager.mm; sourceTree = "<group>"; };
 		18C80EE325B3FF7A001617D0 /* CameraManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraManager.h; sourceTree = "<group>"; };
+		18D594BE262C164A009C1B33 /* SeveData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SeveData.h; sourceTree = "<group>"; };
+		18D594BF262C164A009C1B33 /* SeveData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SeveData.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -274,6 +277,8 @@
 				18C80EDD25B3FF71001617D0 /* NSImage+OpenCV.mm */,
 				1819D8FB2613000500242493 /* FileManager.h */,
 				1819D8FC2613000500242493 /* FileManager.m */,
+				18D594BE262C164A009C1B33 /* SeveData.h */,
+				18D594BF262C164A009C1B33 /* SeveData.m */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -468,6 +473,7 @@
 				188B1C5A25CD9B1A00246C8E /* JXImageDataItem.m in Sources */,
 				1862C78225A4C1F9005AF08A /* JXImageDataView.m in Sources */,
 				188B1C6325CDB51800246C8E /* JXFunctionListView.m in Sources */,
+				18D594C0262C164A009C1B33 /* SeveData.m in Sources */,
 				1879B17225A1CCC900CCC6F1 /* JXRootViewController.m in Sources */,
 				1879B13525A1C98E00CCC6F1 /* AppDelegate.m in Sources */,
 				18C80EDE25B3FF71001617D0 /* NSImage+OpenCV.mm in Sources */,

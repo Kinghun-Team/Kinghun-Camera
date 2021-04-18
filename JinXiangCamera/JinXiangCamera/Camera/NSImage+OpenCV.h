@@ -6,17 +6,18 @@
 //
 
 #import <opencv2/opencv.hpp>
+#import <iostream>
 #import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NSImage (OpenCV)
 
-+(NSImage*)imageWithCVMat:(const cv::Mat&)cvMat;
--(id)initWithCVMat:(const cv::Mat&)cvMat;
++ (NSImage*)imageWithCVMat:(const cv::Mat&)cvMat;
+- (id)initWithCVMat:(const cv::Mat&)cvMat;
 
-@property(nonatomic, readonly) cv::Mat CVMat;
-@property(nonatomic, readonly) cv::Mat CVGrayscaleMat;
+@property (nonatomic, readonly) cv::Mat CVMat;
+@property (nonatomic, readonly) cv::Mat CVGrayscaleMat;
 
 - (CGImageRef)CGImage;
 + (NSImage *)systemImageToGrayImage:(NSImage *)image;
@@ -26,7 +27,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSImage *)graySameBufferImage:(CMSampleBufferRef)sampleBuffer withSize:(NSSize)size;
 + (NSImage *)covertToGrayScaleImage:(CMSampleBufferRef)sampleBuffer withSize:(NSSize)size;
 
+- (NSImage *)turnUpsideDownAndMirrorRotate:(NSInteger)rotate;
 
++ (CGContextRef)applyTransform:(NSInteger)rotate toContextRef:(CGContextRef)contextRef WithSize:(CGSize)size;
 
 @end
 

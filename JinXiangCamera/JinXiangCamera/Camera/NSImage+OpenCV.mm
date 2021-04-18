@@ -37,6 +37,7 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     //参数二：渲染区域
     //源图片
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), image.CGImage);
+    
     //将绘制的颜色空间转成CGImage
     CGImageRef grayImageRef = CGBitmapContextCreateImage(context);
     CGContextRelease(context);
@@ -65,8 +66,12 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     // 用抽样缓存的数据创建一个位图格式的图形上下文（graphics context）对象
     CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    
+    context = [self applyTransform:abs([CameraManager sharedManager].rotate) toContextRef:context WithSize:CGSizeMake(width, height)];
+    
     // 根据这个位图context中的像素数据创建一个Quartz image对象
     CGImageRef quartzImage = CGBitmapContextCreateImage(context);
+    
     // 解锁pixel buffer
     CVPixelBufferUnlockBaseAddress(imageBuffer,0);
     // 释放context和颜色空间
@@ -95,6 +100,8 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
     // 用抽样缓存的数据创建一个位图格式的图形上下文（graphics context）对象
     CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGImageAlphaNone);
+    
+    context = [self applyTransform:abs([CameraManager sharedManager].rotate) toContextRef:context WithSize:CGSizeMake(width, height)];
     // 根据这个位图context中的像素数据创建一个Quartz image对象
     CGImageRef quartzImage = CGBitmapContextCreateImage(context);
     // 解锁pixel buffer
@@ -137,15 +144,13 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     //清空像素数组
     memset(pixels, 0, width*height*sizeof(uint32_t));
     
-    CGContextRef WBcontext = CGBitmapContextCreate(pixels, width, height, 8, width*sizeof(uint32_t), colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedLast);
-    CGContextDrawImage(WBcontext, CGRectMake(0, 0, width, height), quartzImage);
-    
+    CGContextRef BWcontext = CGBitmapContextCreate(pixels, width, height, 8, width*sizeof(uint32_t), colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedLast);
+    CGContextDrawImage(BWcontext, CGRectMake(0, 0, width, height), quartzImage);
     CGImageRelease(quartzImage);
     
     int tt = 1;
     CGFloat intensity;
     int bw;
-    
     for (int y = 0; y <height; y++) {
         for (int x =0; x <width; x ++) {
             uint8_t *rgbaPixel = (uint8_t *)&pixels[y*width+x];
@@ -158,11 +163,14 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
             rgbaPixel[tt + 2] = bw;
         }
     }
-    CGImageRef image = CGBitmapContextCreateImage(WBcontext);
+    
+    BWcontext = [self applyTransform:abs([CameraManager sharedManager].rotate) toContextRef:BWcontext WithSize:CGSizeMake(width, height)];
+    
+    CGImageRef image = CGBitmapContextCreateImage(BWcontext);
     // 解锁pixel buffer
     CVPixelBufferUnlockBaseAddress(imageBuffer,0);
     
-    CGContextRelease(WBcontext);
+    CGContextRelease(BWcontext);
     CGColorSpaceRelease(colorSpace);
     
     free(pixels);
@@ -217,6 +225,128 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     // we're done with image now too
     CGImageRelease(quartzImage);
     return resultUIImage;
+}
+
+- (NSImage *)turnUpsideDownAndMirrorRotate:(NSInteger)rotate {
+    NSSize srcSize = [self size];
+    float srcw = srcSize.width;
+    float srch = srcSize.height;
+    if((!self) || srcw == 0 || srch == 0) {
+        return nil;
+    }
+    float rotateDeg = (float)(rotate % 360);
+    NSRect rotateRect = NSMakeRect(0, 0, srcw, srch);
+    if (rotateDeg == 90.0 || rotateDeg == 270.0) {
+        rotateRect = NSMakeRect(0, 0, srch, srcw);
+    }
+    NSImage *rotatedImage = [[NSImage alloc] initWithSize:rotateRect.size];
+    
+    [rotatedImage lockFocus];
+    NSAffineTransform *transform = [NSAffineTransform transform];
+    //方法一：180度旋转
+    [transform translateXBy:(0.5 * srcw) yBy: (0.5 * srch)];  //将坐标系原点移至图片中心点
+    [transform rotateByDegrees:rotateDeg];//以图片中心为原点，旋转传入的度数
+    [transform translateXBy:(-0.5 * srcw) yBy: (-0.5 * srch)]; //将坐标系回复原状
+    //水平镜像反转
+    [transform scaleXBy:-1.0 yBy:1.0];
+    [transform translateXBy:-srcw yBy:0];
+    //方法二：竖直镜像反转
+    //    [transform scaleXBy:1.0 yBy:-1.0];
+    //    [transform translateXBy:0 yBy:-srch];
+    [transform concat];
+    [self drawInRect:rotateRect fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0];
+    [rotatedImage unlockFocus];
+    return rotatedImage;
+}
+
+//+ (CGImageRef)applyTransform:(CGAffineTransform)transform toImageRef:(CGImageRef)imageref {
+//    size_t width = CGImageGetWidth(imageref);
+//    size_t height = CGImageGetHeight(imageref);
+//    CGSize newSize = CGRectApplyAffineTransform(CGRectMake(0, 0, width, height), transform).size;
+//    CGContextRef ctx = CGBitmapContextCreate(NULL, newSize.width, newSize.height,
+//                                             CGImageGetBitsPerComponent(imageref), 0,
+//                                             CGImageGetColorSpace(imageref),
+//                                             CGImageGetBitmapInfo(imageref));
+//    CGContextConcatCTM(ctx, transform);
+//    CGRect rotatedDrawRect = CGRectZero;
+//    if (transform.a >= 0 && transform.b >= 0) {
+//        rotatedDrawRect = CGRectMake(transform.b * height * transform.a, - transform.b * transform.b * height, width, height);
+//    }else if (transform.a <= 0 && transform.b >= 0) {
+//        rotatedDrawRect = CGRectMake(- fabs(powf(transform.a, 2) * width), - fabs(transform.a * transform.b * width) - height, width, height);
+//    }else if (transform.a <= 0 && transform.b <= 0){
+//        rotatedDrawRect = CGRectMake(- fabs(width + height * fabs(transform.a * transform.b)), - fabs(height * powf(transform.a, 2)), width, height);
+//    }else if (transform.a >= 0 && transform.b <= 0){
+//        rotatedDrawRect = CGRectMake(- fabs(powf(transform.b, 2) * width), fabs(transform.a * transform.b * width), width, height);
+//    }
+//    CGContextDrawImage(ctx, rotatedDrawRect, imageref);
+//    CGImageRef resultRef = CGBitmapContextCreateImage(ctx);
+//    CGContextRelease(ctx);
+//    return resultRef;
+//}
+
+//@property (nonatomic, strong) CIContext* ciContext;
+//- (void)dealWithSampleBuffer:(CMSampleBufferRef)buffer {
+//    CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(buffer);
+//
+//    CIImage *ciimage = [CIImage imageWithCVPixelBuffer:pixelBuffer];
+//    size_t width                        = CVPixelBufferGetWidth(pixelBuffer);
+//    size_t height                       = CVPixelBufferGetHeight(pixelBuffer);
+//   // 旋转的方法
+//    CIImage *wImage = [ciimage imageByApplyingCGOrientation:kCGImagePropertyOrientationLeft];
+//
+//    CIImage *newImage = [wImage imageByApplyingTransform:CGAffineTransformMakeScale(0.5, 0.5)];
+//    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+//    CVPixelBufferRef newPixcelBuffer = nil;
+//    CVPixelBufferCreate(kCFAllocatorDefault, height * 0.5, width * 0.5, kCVPixelFormatType_32BGRA, nil, &newPixcelBuffer);
+//    [_ciContext render:newImage toCVPixelBuffer:newPixcelBuffer];
+//
+//
+//    //
+//    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+//    CMVideoFormatDescriptionRef videoInfo = nil;
+//    CMVideoFormatDescriptionCreateForImageBuffer(kCFAllocatorDefault, newPixcelBuffer, &videoInfo);
+//    CMTime duration = CMSampleBufferGetDuration(buffer);
+//    CMTime presentationTimeStamp = CMSampleBufferGetPresentationTimeStamp(buffer);
+//    CMTime decodeTimeStamp = CMSampleBufferGetDecodeTimeStamp(buffer);
+//    CMSampleTimingInfo sampleTimingInfo;
+//    sampleTimingInfo.duration = duration;
+//    sampleTimingInfo.presentationTimeStamp = presentationTimeStamp;
+//    sampleTimingInfo.decodeTimeStamp = decodeTimeStamp;
+//    //
+//    CMSampleBufferRef newSampleBuffer = nil;
+//    CMSampleBufferCreateForImageBuffer(kCFAllocatorMalloc, newPixcelBuffer, true, nil, nil, videoInfo, &sampleTimingInfo, &newSampleBuffer);
+//
+//   // 对新buffer做处理
+//
+//    // release
+//    CVPixelBufferRelease(newPixcelBuffer);
+//    CFRelease(newSampleBuffer);
+//}
+
++ (CGContextRef)applyTransform:(NSInteger)rotate toContextRef:(CGContextRef)contextRef WithSize:(CGSize)size {
+    NSInteger i = -rotate;
+    CGAffineTransform transform = CGAffineTransformMakeRotation(M_PI/2 * i);
+    size_t width = size.width;
+    size_t height = size.height;
+    CGContextConcatCTM(contextRef, transform);
+    CGRect rotatedDrawRect = CGRectZero;
+    if (transform.a >= 0 && transform.b >= 0) {
+        rotatedDrawRect = CGRectMake(transform.b * height * transform.a, - transform.b * transform.b * height, width, height);
+    }else if (transform.a <= 0 && transform.b >= 0) {
+        width = size.height;
+        height = size.width;
+        rotatedDrawRect = CGRectMake(- fabs(powf(transform.a, 2) * width), - fabs(transform.a * transform.b * width) - height, width, height);
+    }else if (transform.a <= 0 && transform.b <= 0){
+        rotatedDrawRect = CGRectMake(- fabs(width + height * fabs(transform.a * transform.b)), - fabs(height * powf(transform.a, 2)), width, height);
+    }else if (transform.a >= 0 && transform.b <= 0){
+        width = size.height;
+        height = size.width;
+        rotatedDrawRect = CGRectMake(- fabs(powf(transform.b, 2) * width), fabs(transform.a * transform.b * width), width, height);
+    }
+    CGImageRef quartzImage = CGBitmapContextCreateImage(contextRef);
+    CGContextDrawImage(contextRef, rotatedDrawRect, quartzImage);
+    CGImageRelease(quartzImage);
+    return contextRef;
 }
 
 -(CGImageRef)CGImage {
@@ -289,7 +419,7 @@ static void ProviderReleaseDataNOP(void *info, const void *data, size_t size)
     return [[NSImage alloc] initWithCVMat:cvMat];
 }
 
--(id)initWithCVMat:(const cv::Mat&)cvMat {
+- (id)initWithCVMat:(const cv::Mat&)cvMat {
     NSData *data = [NSData dataWithBytes:cvMat.data length:cvMat.elemSize() * cvMat.total()];
     CGColorSpaceRef colorSpace;
     if (cvMat.elemSize() == 1)

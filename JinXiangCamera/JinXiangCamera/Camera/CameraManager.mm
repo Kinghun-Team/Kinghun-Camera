@@ -83,8 +83,10 @@ typedef void(^GetImage)(NSImage *image);
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedManager = [[CameraManager alloc] init];
+        sharedManager.rotate = 0;
         sharedManager.imageSize = imageSize1920;
         sharedManager.imageColor = Colour;
+        sharedManager.imageScale = 1.0;
     });
     return sharedManager;
 }
@@ -222,6 +224,12 @@ typedef void(^GetImage)(NSImage *image);
     } else {
         image = [NSImage covertToGrayScaleImage:sampleBuffer withSize:size];
     }
+    NSSize newSzie = size;
+    if (abs(self.rotate % 2) == 1) {
+        newSzie = NSMakeSize(size.height, size.width);
+    }
+    image.size = newSzie;
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(cameraBufferIamge:)]) {
             [self.delegate cameraBufferIamge:image];
@@ -230,7 +238,6 @@ typedef void(^GetImage)(NSImage *image);
     if (self.getPhoto == YES) {//获取帧
         self.getPhoto = NO;
         getImage(image);
-//        [self saveImage:image];
         [[FileManager sharedManager] saveImage:image];
     }
 }
@@ -247,6 +254,7 @@ typedef void(^GetImage)(NSImage *image);
             return;
         }
         NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+        
 //        [imageData writeToFile:[@"~/Documents/photoTest.png" stringByExpandingTildeInPath] atomically:YES];
         dispatch_async(dispatch_get_main_queue(), ^{
             imageView.image = [[NSImage alloc] initWithData:imageData];

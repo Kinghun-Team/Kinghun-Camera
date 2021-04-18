@@ -34,6 +34,10 @@ typedef enum {
 
 @property(nonatomic,assign)BOOL allCamera;//开启获取所有可用摄像头
 
+@property(nonatomic,assign)CGFloat imageScale;//0.5~2.0倍
+
+@property(nonatomic,assign)NSInteger rotate;//旋转角度π/2的倍数 支持0~3,太大会有问题
+
 @property(nonatomic,assign)ImageSize imageSize;//图片大小设置
 
 @property(nonatomic,weak)id<cameraManagerDelegate> delegate;
