@@ -49,7 +49,7 @@
 
 - (void)initView {
     
-    JHLabel *pathLabel = [[JHLabel alloc] initWithFrame:NSMakeRect((self.frame.size.width - 370 - 160)/2, self.frame.size.height - 35 , 70, 25)];
+    JHLabel *pathLabel = [[JHLabel alloc] initWithFrame:NSMakeRect((self.frame.size.width - 770 - 160)/2, self.frame.size.height - 35 , 70, 25)];
     pathLabel.wantsLayer = YES;
     pathLabel.backgroundColor = [NSColor clearColor];
     pathLabel.font = [NSFont systemFontOfSize:13];
@@ -57,7 +57,7 @@
     [self addSubview:pathLabel];
     pathLabel.text = @"保存路径：";
 
-    self.selectPath = [[NSComboBox alloc] initWithFrame:NSMakeRect(pathLabel.frame.origin.x+pathLabel.frame.size.width, self.frame.size.height - 40, 300, 30)];
+    self.selectPath = [[NSComboBox alloc] initWithFrame:NSMakeRect(pathLabel.frame.origin.x+pathLabel.frame.size.width, self.frame.size.height - 40, 700, 30)];
     self.selectPath.usesDataSource = YES;
     self.selectPath.dataSource = self;
     self.selectPath.delegate = self;

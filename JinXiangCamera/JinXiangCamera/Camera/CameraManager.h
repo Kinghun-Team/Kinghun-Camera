@@ -42,6 +42,8 @@ typedef enum {
 
 @property(nonatomic,weak)id<cameraManagerDelegate> delegate;
 
+@property (nonatomic,assign) BOOL getPhoto;//获取图片
+
 + (instancetype)sharedManager;
 + (void)cameraDefaultConfig;//默认设置
 + (NSArray *)cameraDevice;//获取摄像头

@@ -8,7 +8,7 @@
 #import "JXCameraView.h"
 
 
-#define tabBarHeight   100
+#define tabBarHeight   30
 
 @interface JXCameraView()<cameraManagerDelegate>
 
@@ -16,11 +16,36 @@
 
 @property(nonatomic,strong)NSArray *pathArray;
 
+@property(nonatomic,strong)NSArray *arrWidth;
+@property(nonatomic,strong)NSArray *arrHeight;
+@property(nonatomic,strong)NSArray *arrMinScale;
+
+
 @end
 
 @implementation JXCameraView
 
+- (NSArray *)arrWidth{
+    if (!_arrWidth) {
+        _arrWidth = @[@"1920", @"2560",@"3840", @"4480"];
+        
+    }
+    return _arrWidth;
+}
 
+- (NSArray *)arrHeight{
+    if (!_arrHeight) {
+        _arrHeight = @[@"1080", @"1440",@"2160", @"2520"];
+    }
+    return _arrHeight;
+}
+
+- (NSArray *)arrMinScale{
+    if (!_arrMinScale) {
+        _arrMinScale = @[@"0.35", @"0.26",@"0.18", @"0.15"];
+    }
+    return _arrMinScale;
+}
 
 - (void)drawRect:(NSRect)dirtyRect {
     [super drawRect:dirtyRect];
@@ -32,7 +57,8 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.wantsLayer = YES;
-        self.layer.backgroundColor = [NSColor colorWithWhite:0.95 alpha:1].CGColor;
+//        self.layer.backgroundColor = [NSColor colorWithRed:(0.266) green:(0.266) blue:(0.266) alpha:(1)].CGColor;
+//        self.layer.backgroundColor = [NSColor whiteColor].CGColor;
         
         self.cameraView = [[NSImageView alloc] init];
         self.cameraView.wantsLayer = YES;
@@ -47,17 +73,19 @@
         [self addSubview:self.imageScView];
         
         NSButton *enlargeBtn = [[NSButton alloc] init];
-        enlargeBtn.frame = NSMakeRect(100, 25, 50, 50);
+        enlargeBtn.wantsLayer = YES;
+        enlargeBtn.frame = NSMakeRect(10, 5, 70, 20);
         enlargeBtn.bezelStyle = NSRoundedBezelStyle;
-        enlargeBtn.layer.backgroundColor = [NSColor whiteColor].CGColor;
+//        enlargeBtn.bezelStyle = NSBezelStyleRounded;
+//        enlargeBtn.layer.backgroundColor = [NSColor colorWithRed:(1) green:(0.266) blue:(0.266) alpha:(1)].CGColor;
         enlargeBtn.title = @"放大";
-        [enlargeBtn setTitle:[enlargeBtn title] color:[NSColor blackColor] font:12];
+        [enlargeBtn setTitle:[enlargeBtn title] color:[NSColor colorWithRed:(0) green:(0) blue:(0) alpha:(1)] font:12];
         enlargeBtn.target = self;
         enlargeBtn.action = @selector(enlargeClick);
         [self addSubview:enlargeBtn];
         
         NSButton *narrowBtn = [[NSButton alloc] init];
-        narrowBtn.frame = NSMakeRect(40, 25, 50, 50);
+        narrowBtn.frame = NSMakeRect(10 + 80, 0, 70, 30);
         narrowBtn.bezelStyle = NSRoundedBezelStyle;
         narrowBtn.layer.backgroundColor = [NSColor whiteColor].CGColor;
         narrowBtn.title = @"缩小";
@@ -66,8 +94,28 @@
         narrowBtn.action = @selector(narrowClick);
         [self addSubview:narrowBtn];
         
+        NSButton *suitBtn = [[NSButton alloc] init];
+        suitBtn.frame = NSMakeRect(10 + 160, 0, 70, 30);
+        suitBtn.bezelStyle = NSRoundedBezelStyle;
+        suitBtn.layer.backgroundColor = [NSColor whiteColor].CGColor;
+        suitBtn.title = @"适合";
+        [suitBtn setTitle:[suitBtn title] color:[NSColor blackColor] font:12];
+        suitBtn.target = self;
+        suitBtn.action = @selector(suitClick);
+        [self addSubview:suitBtn];
+        
+        NSButton *pixelBtn = [[NSButton alloc] init];
+        pixelBtn.frame = NSMakeRect(10 + 240, 0, 70, 30);
+        pixelBtn.bezelStyle = NSRoundedBezelStyle;
+        pixelBtn.layer.backgroundColor = [NSColor whiteColor].CGColor;
+        pixelBtn.title = @"1:1";
+        [pixelBtn setTitle:[pixelBtn title] color:[NSColor blackColor] font:12];
+        pixelBtn.target = self;
+        pixelBtn.action = @selector(pixelClick);
+        [self addSubview:pixelBtn];
+        
         NSButton *LeftRotation = [[NSButton alloc] init];
-        LeftRotation.frame = NSMakeRect(160, 25, 70, 50);
+        LeftRotation.frame = NSMakeRect(10 + 320, 0, 70, 30);
         LeftRotation.bezelStyle = NSRoundedBezelStyle;
         LeftRotation.layer.backgroundColor = [NSColor whiteColor].CGColor;
         LeftRotation.title = @"左旋转";
@@ -77,7 +125,7 @@
         [self addSubview:LeftRotation];
         
         NSButton *RightRotation = [[NSButton alloc] init];
-        RightRotation.frame = NSMakeRect(240, 25, 70, 50);
+        RightRotation.frame = NSMakeRect(10 + 400, 0, 70, 30);
         RightRotation.bezelStyle = NSRoundedBezelStyle;
         RightRotation.layer.backgroundColor = [NSColor whiteColor].CGColor;
         RightRotation.title = @"右旋转";
@@ -94,19 +142,26 @@
 }
 
 - (void)cameraBufferIamge:(NSImage *)image {
+    if([CameraManager sharedManager].getPhoto == YES) {
+        return;
+    }
     image.size = NSMakeSize(image.size.width*[CameraManager sharedManager].imageScale, image.size.height*[CameraManager sharedManager].imageScale);
+//    NSLog(@"image.size.width = %f", image.size.width);
+//    NSLog(@"image.size.height = %f", image.size.height);
     CGFloat x = 0.0;
     CGFloat y = 0.0;
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height - tabBarHeight;
     if (image.size.width > width) {
         x = 0.0;
+//        x = (image.size.width - width) / 2;
         width = image.size.width;
     } else {
         x = (width - image.size.width) / 2;
     }
     if (image.size.height > height) {
         y = 0.0;
+//        y = (image.size.height - height) / 2;
         height = image.size.height;
     } else {
         y = (height - image.size.height) / 2;
@@ -117,18 +172,48 @@
 }
 
 - (void)enlargeClick {
-    if ([CameraManager sharedManager].imageScale < 2.0) {
+    [CameraManager sharedManager].imageScale += 0.025;
+    if ([CameraManager sharedManager].imageScale > 2.0) {
 //        self.imageScView.documentView.
 //        [self.imageScView.documentView scrollPoint:NSMakePoint(x,y)];
-        [CameraManager sharedManager].imageScale += 0.1;
+        [CameraManager sharedManager].imageScale = 2.0;
     }
+    NSLog(@"imageScale = %f", [CameraManager sharedManager].imageScale);
 }
 
 - (void)narrowClick {
-    if ([CameraManager sharedManager].imageScale > 0.5) {
+    CGFloat div;
+    div = [self.arrMinScale[[CameraManager sharedManager].imageSize] floatValue];
+    
+    [CameraManager sharedManager].imageScale -= 0.025;
+    if ([CameraManager sharedManager].imageScale < div) {
 //        [self.imageScView.documentView scrollPoint:NSMakePoint(x,y)];
-        [CameraManager sharedManager].imageScale -= 0.1;
+        [CameraManager sharedManager].imageScale = div;
     }
+//    [CameraManager sharedManager].imageScale = div;
+    NSLog(@"imageScale = %f", [CameraManager sharedManager].imageScale);
+}
+
+- (void)suitClick {
+    CGFloat div;
+    if (abs([CameraManager sharedManager].rotate % 2) == 0) {
+        //水平方向
+        div = [self.arrWidth[[CameraManager sharedManager].imageSize] floatValue];
+        [CameraManager sharedManager].imageScale = (self.frame.size.width) * 2 * 0.99 / div;
+    } else {
+        //垂直方向
+        div = [self.arrHeight[[CameraManager sharedManager].imageSize] floatValue];
+        [CameraManager sharedManager].imageScale = (self.frame.size.height) * 1.05 / div;
+    }
+
+    NSLog(@"self.frame.size.width = %f", self.frame.size.width);
+    NSLog(@"self.frame.size.height = %f", self.frame.size.height);
+    NSLog(@"div = %f", div);
+    NSLog(@"imageScale = %f", [CameraManager sharedManager].imageScale);
+}
+
+- (void)pixelClick {
+    [CameraManager sharedManager].imageScale = 2;
 }
 
 - (void)leftClick {
@@ -137,6 +222,7 @@
     } else {
         [CameraManager sharedManager].rotate -= 1;
     }
+    [self suitClick];
 }
 
 - (void)rightClick {
@@ -145,6 +231,7 @@
     } else {
         [CameraManager sharedManager].rotate += 1;
     }
+    [self suitClick];
 }
 
 

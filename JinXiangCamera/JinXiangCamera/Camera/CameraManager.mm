@@ -37,7 +37,7 @@ typedef void(^GetImage)(NSImage *image);
 @property (nonatomic ,strong) AVCaptureVideoPreviewLayer *previewLayer;
 
 @property (nonatomic,assign) CGFloat imageWidth;//图片高度  图片比例9：16
-@property (nonatomic,assign) BOOL getPhoto;//获取图片
+
 
 @property (nonatomic,strong) NSDictionary *rgbOutputSettings;
 
@@ -87,6 +87,7 @@ typedef void(^GetImage)(NSImage *image);
         sharedManager.imageSize = imageSize1920;
         sharedManager.imageColor = Colour;
         sharedManager.imageScale = 1.0;
+        sharedManager.getPhoto = NO;
     });
     return sharedManager;
 }
@@ -236,9 +237,12 @@ typedef void(^GetImage)(NSImage *image);
         }
     });
     if (self.getPhoto == YES) {//获取帧
-        self.getPhoto = NO;
+        CGFloat buf = self.imageScale;
+        self.imageScale = 1;
         getImage(image);
         [[FileManager sharedManager] saveImage:image];
+        self.imageScale = buf;
+        self.getPhoto = NO;
     }
 }
 
@@ -264,6 +268,7 @@ typedef void(^GetImage)(NSImage *image);
 }
 
 - (void)getPhotoImage:(void(^)(NSImage *image))successImage {
+    NSLog(@"点击拍照!");
     self.getPhoto = YES;
     getImage = ^(NSImage *image) {
         successImage(image);

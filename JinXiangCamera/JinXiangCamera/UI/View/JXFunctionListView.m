@@ -32,6 +32,7 @@
 @property(nonatomic,strong)NSButton *grayscaleBtn;
 @property(nonatomic,strong)NSButton *blackAndWhiteBtn;
 
+@property(nonatomic,strong)NSButton *AutoCut;
 @property(nonatomic,strong)NSButton *photoButton;
 
 @end
@@ -225,12 +226,25 @@
     [self addSubview:self.blackAndWhiteBtn];
     self.blackAndWhiteBtn.frame = NSMakeRect(self.grayscaleBtn.frame.origin.x+self.grayscaleBtn.frame.size.width+5, colorModeLabel.frame.origin.y-colorModeLabel.frame.size.height-15, 60, 30);
     
+    self.AutoCut = [[NSButton alloc] init];
+    [self.AutoCut setButtonType:NSButtonTypeSwitch];
+    self.AutoCut.bezelStyle = NSRoundedBezelStyle;
+    [self.AutoCut setState:NSGestureRecognizerStateBegan];
+    self.AutoCut.layer.backgroundColor = [NSColor whiteColor].CGColor;
+    self.AutoCut.title = @"自动裁切";
+    [self.AutoCut setTitle:[self.AutoCut title] color:[NSColor blackColor] font:12];
+    self.AutoCut.target = self;
+//    self.AutoCut.action = @selector(colorClick:);
+    [self addSubview:self.AutoCut];
+    self.AutoCut.frame = NSMakeRect(self.frame.size.width-80-115, 170, 80, 30);
+    
     self.photoButton = [[NSButton alloc] init];
-    self.photoButton.frame = NSMakeRect(self.frame.size.width-50-25, 25, 50, 50);
-    self.photoButton.bezelStyle = NSRoundedBezelStyle;
+    self.photoButton.frame = NSMakeRect(self.frame.size.width-80-15, 150, 80, 80);
+//    self.photoButton.bezelStyle = NSRoundedBezelStyle;
+    self.photoButton.bezelStyle = NSBezelStyleRegularSquare;
     self.photoButton.layer.backgroundColor = [NSColor whiteColor].CGColor;
     self.photoButton.title = @"拍照";
-    [self.photoButton setTitle:[self.photoButton title] color:[NSColor blackColor] font:12];
+    [self.photoButton setTitle:[self.photoButton title] color:[NSColor blackColor] font:18];
     self.photoButton.target = self;
     self.photoButton.action = @selector(photoClick);
     [self addSubview:self.photoButton];
@@ -378,34 +392,16 @@
     NSInteger selectedIndex = comboBox.indexOfSelectedItem;
     if (comboBox.tag == typeTag) {
         FileSeveData.selectImageType = selectedIndex;
-        [self setImageSizeToIndex:selectedIndex];
+        [self setImageTypeToIndex:selectedIndex];
     } else {
         [CameraManager sharedManager].imageScale = 1.0;
         FileSeveData.selectSize = selectedIndex;
-        [self setImageTypeToIndex:selectedIndex];
+        [self setImageSizeToIndex:selectedIndex];
+    
     }
 }
 
 - (void)setImageSizeToIndex:(NSInteger )index {
-    switch (index) {
-        case 0:
-            [[FileManager sharedManager] choiceImageType:IMGPNG];
-            break;
-        case 1:
-            [[FileManager sharedManager] choiceImageType:IMGJPG];
-            break;
-        case 2:
-            [[FileManager sharedManager] choiceImageType:IMGTIF];
-            break;
-        case 3:
-            [[FileManager sharedManager] choiceImageType:IMGBMP];
-            break;
-        default:
-            break;
-    }
-}
-
-- (void)setImageTypeToIndex:(NSInteger)index {
     switch (index) {
         case 0:
             [CameraManager sharedManager].imageSize = imageSize1920;
@@ -422,6 +418,28 @@
         default:
             break;
     }
+    NSLog(@"click ImageSize = %d", index);
+}
+
+- (void)setImageTypeToIndex:(NSInteger)index {
+
+    switch (index) {
+        case 0:
+            [[FileManager sharedManager] choiceImageType:IMGPNG];
+            break;
+        case 1:
+            [[FileManager sharedManager] choiceImageType:IMGJPG];
+            break;
+        case 2:
+            [[FileManager sharedManager] choiceImageType:IMGTIF];
+            break;
+        case 3:
+            [[FileManager sharedManager] choiceImageType:IMGBMP];
+            break;
+        default:
+            break;
+    }
+    NSLog(@"click ImageType = %d", index);
 }
 
 
