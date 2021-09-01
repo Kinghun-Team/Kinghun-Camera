@@ -229,12 +229,12 @@
     self.AutoCut = [[NSButton alloc] init];
     [self.AutoCut setButtonType:NSButtonTypeSwitch];
     self.AutoCut.bezelStyle = NSRoundedBezelStyle;
-    [self.AutoCut setState:NSGestureRecognizerStateBegan];
+    [self.AutoCut setState:NSGestureRecognizerStatePossible];
     self.AutoCut.layer.backgroundColor = [NSColor whiteColor].CGColor;
     self.AutoCut.title = @"自动裁切";
     [self.AutoCut setTitle:[self.AutoCut title] color:[NSColor blackColor] font:12];
     self.AutoCut.target = self;
-//    self.AutoCut.action = @selector(colorClick:);
+    self.AutoCut.action = @selector(imageCutClick:);
     [self addSubview:self.AutoCut];
     self.AutoCut.frame = NSMakeRect(self.frame.size.width-80-115, 170, 80, 30);
     
@@ -254,6 +254,7 @@
     if (self.photoClickBlock) {
         self.photoClickBlock();
     }
+//    [[CameraManager sharedManager] cameraDidSelected];
 }
 
 - (void)dateClick:(NSButton *)button {
@@ -292,6 +293,14 @@
     [[CameraManager sharedManager] setCameraRGBType:blackAndWhite] ;
 }
 
+- (void)imageCutClick:(NSButton *)button {
+    if (button.state == NSGestureRecognizerStateBegan) {
+        [CameraManager sharedManager].isCut = YES;
+    } else {
+        [CameraManager sharedManager].isCut = NO;
+    }
+}
+
 #pragma mark - NSTextFieldDelegate
 -(BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
     if (commandSelector == @selector(insertNewline:)) {
@@ -326,7 +335,7 @@
                 }
                 AVCaptureDevice *dev = devices[self.selectCameraIndex];
                 self.cameraColumn.title = [NSString stringWithFormat:@"当前摄像头：%@",dev.localizedName];
-                [[CameraManager sharedManager] start];
+//                [[CameraManager sharedManager] start];
             }
             [self.cameraTab reloadData];
         });
@@ -397,7 +406,6 @@
         [CameraManager sharedManager].imageScale = 1.0;
         FileSeveData.selectSize = selectedIndex;
         [self setImageSizeToIndex:selectedIndex];
-    
     }
 }
 

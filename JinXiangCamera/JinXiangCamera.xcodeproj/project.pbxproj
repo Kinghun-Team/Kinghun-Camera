@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1819D8FD2613000500242493 /* FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1819D8FC2613000500242493 /* FileManager.m */; };
+		18249E90266499210071CFED /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1889E5F62647E6AD00070C6E /* opencv2.framework */; };
 		1862C78225A4C1F9005AF08A /* JXImageDataView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1862C78125A4C1F9005AF08A /* JXImageDataView.m */; };
 		1862C7C925B212F1005AF08A /* JHLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1862C7C825B212F0005AF08A /* JHLabel.m */; };
 		1862C7D925B2E2AD005AF08A /* JXCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1862C7D825B2E2AD005AF08A /* JXCameraView.m */; };
@@ -34,7 +35,6 @@
 		1879B19025A1ED4000CCC6F1 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1879B18F25A1ED4000CCC6F1 /* AVFoundation.framework */; };
 		188B1C5A25CD9B1A00246C8E /* JXImageDataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 188B1C5925CD9B1A00246C8E /* JXImageDataItem.m */; };
 		188B1C6325CDB51800246C8E /* JXFunctionListView.m in Sources */ = {isa = PBXBuildFile; fileRef = 188B1C6225CDB51800246C8E /* JXFunctionListView.m */; };
-		18C80ED225B3FD3C001617D0 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18C80ED125B3FD3C001617D0 /* opencv2.framework */; };
 		18C80EDE25B3FF71001617D0 /* NSImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 18C80EDD25B3FF71001617D0 /* NSImage+OpenCV.mm */; };
 		18C80EE425B3FF7B001617D0 /* CameraManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 18C80EE225B3FF7A001617D0 /* CameraManager.mm */; };
 		18D594C0262C164A009C1B33 /* SeveData.m in Sources */ = {isa = PBXBuildFile; fileRef = 18D594BF262C164A009C1B33 /* SeveData.m */; };
@@ -105,6 +105,7 @@
 		1879B18025A1DA1A00CCC6F1 /* JXBaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXBaseViewController.h; sourceTree = "<group>"; };
 		1879B18125A1DA1A00CCC6F1 /* JXBaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JXBaseViewController.m; sourceTree = "<group>"; };
 		1879B18F25A1ED4000CCC6F1 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		1889E5F62647E6AD00070C6E /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		188B1C5825CD9B1A00246C8E /* JXImageDataItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXImageDataItem.h; sourceTree = "<group>"; };
 		188B1C5925CD9B1A00246C8E /* JXImageDataItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JXImageDataItem.m; sourceTree = "<group>"; };
 		188B1C6125CDB51800246C8E /* JXFunctionListView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXFunctionListView.h; sourceTree = "<group>"; };
@@ -131,7 +132,7 @@
 				1879B19025A1ED4000CCC6F1 /* AVFoundation.framework in Frameworks */,
 				1862C80425B36F78005AF08A /* CoreVideo.framework in Frameworks */,
 				1862C80625B36F84005AF08A /* CoreMedia.framework in Frameworks */,
-				18C80ED225B3FD3C001617D0 /* opencv2.framework in Frameworks */,
+				18249E90266499210071CFED /* opencv2.framework in Frameworks */,
 				1862C80825B36F93005AF08A /* OpenCL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -226,6 +227,7 @@
 			children = (
 				1879B13325A1C98E00CCC6F1 /* AppDelegate.h */,
 				1879B13425A1C98E00CCC6F1 /* AppDelegate.m */,
+				1889E5F52647E6AD00070C6E /* OpenCV */,
 				1862C7AE25AE0067005AF08A /* Profile */,
 				1879B16725A1C9C300CCC6F1 /* Camera */,
 				1879B16625A1C9B900CCC6F1 /* UI */,
@@ -335,6 +337,14 @@
 				1879B18F25A1ED4000CCC6F1 /* AVFoundation.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1889E5F52647E6AD00070C6E /* OpenCV */ = {
+			isa = PBXGroup;
+			children = (
+				1889E5F62647E6AD00070C6E /* opencv2.framework */,
+			);
+			path = OpenCV;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -648,8 +658,9 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = W3P68MWXT2;
+				DEVELOPMENT_TEAM = NH7G9A3Y3Y;
 				ENABLE_HARDENED_RUNTIME = YES;
+				EXCLUDED_ARCHS = arm64;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/JinXiangCamera/OpenCV",
@@ -663,8 +674,9 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				PRODUCT_BUNDLE_IDENTIFIER = com.JinXiang.image.JinXiangCamera;
+				PRODUCT_BUNDLE_IDENTIFIER = com.image.JinXiangCamera;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
@@ -677,8 +689,9 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = W3P68MWXT2;
+				DEVELOPMENT_TEAM = NH7G9A3Y3Y;
 				ENABLE_HARDENED_RUNTIME = YES;
+				EXCLUDED_ARCHS = arm64;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/JinXiangCamera/OpenCV",
@@ -692,8 +705,10 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				PRODUCT_BUNDLE_IDENTIFIER = com.JinXiang.image.JinXiangCamera;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.image.JinXiangCamera;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Release;
 		};

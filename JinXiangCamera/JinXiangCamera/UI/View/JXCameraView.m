@@ -196,7 +196,7 @@
 
 - (void)suitClick {
     CGFloat div;
-    if (abs([CameraManager sharedManager].rotate % 2) == 0) {
+    if (labs([CameraManager sharedManager].rotate % 2) == 0) {
         //水平方向
         div = [self.arrWidth[[CameraManager sharedManager].imageSize] floatValue];
         [CameraManager sharedManager].imageScale = (self.frame.size.width) * 2 * 0.99 / div;

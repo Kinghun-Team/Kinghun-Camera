@@ -40,6 +40,8 @@ typedef enum {
 
 @property(nonatomic,assign)ImageSize imageSize;//图片大小设置
 
+@property(nonatomic,assign)BOOL isCut;//默认不裁剪
+
 @property(nonatomic,weak)id<cameraManagerDelegate> delegate;
 
 @property (nonatomic,assign) BOOL getPhoto;//获取图片
@@ -52,6 +54,8 @@ typedef enum {
 - (void)setNewAVCapture:(AVCaptureDevice *)device;//设置新的摄像头
 - (void)getPhotoImage:(void(^)(NSImage *image))successImage;//获取NSImage对象
 - (void)setCameraRGBType:(ImageModel)imageRGB;
+
+- (void)cameraDidSelected;
 
 @end
 

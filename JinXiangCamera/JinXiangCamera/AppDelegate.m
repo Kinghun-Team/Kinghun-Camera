@@ -22,6 +22,7 @@
     NSViewController *mainVC = [[JXRootViewController alloc] init];
     
     self.mainWindow =  [NSWindow windowWithContentViewController:mainVC];
+    self.mainWindow.appearance = [NSAppearance appearanceNamed:@"NSAppearanceNameAqua"];//锁定浅色模式
     self.mainWindow.delegate = self;
 //    NSWindow *mainWindow = [[NSWindow alloc] initWithContentRect:CGRectMake(0, 0, 1000, 600) styleMask:NSWindowStyleMaskTitled|NSWindowStyleMaskMiniaturizable|NSWindowStyleMaskResizable|NSWindowStyleMaskClosable|NSWindowStyleMaskUtilityWindow backing:NSBackingStoreBuffered defer:NO];
 //    mainWindow.contentViewController = mainVC;
@@ -35,7 +36,6 @@
     [self.mainWindowController.window makeKeyAndOrderFront:self];
     [self.mainWindowController.window center];
     [self.mainWindowController showWindow:nil];
-    
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication*)theApplication hasVisibleWindows:(BOOL)flag {

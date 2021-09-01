@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSImage (OpenCV)
 
-+ (NSImage*)imageWithCVMat:(const cv::Mat&)cvMat;
++ (NSImage *)imageWithCVMat:(const cv::Mat&)cvMat;
 - (id)initWithCVMat:(const cv::Mat&)cvMat;
 
 @property (nonatomic, readonly) cv::Mat CVMat;
@@ -29,7 +29,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSImage *)turnUpsideDownAndMirrorRotate:(NSInteger)rotate;
 
-+ (CGContextRef)applyTransform:(NSInteger)rotate toContextRef:(CGContextRef)contextRef WithSize:(CGSize)size;
++ (CGContextRef)applyTransform:(NSInteger)rotate toContextRef:(CGContextRef)contextRef withSize:(CGSize)size;
+
+//+ (CGPoint)edgeDetectionToImage:(NSImage *)image;
+
++ (NSImage *)getSubImageFrom:(NSImage *)imageToCrop withRect:(CGRect)rect;
 
 @end
 
